@@ -1,0 +1,37 @@
+{
+  "generatedAt": "2026-10-20T23:41:04.917Z",
+  "sources": [
+    {
+      "id": "fx",
+      "name": "European Central Bank euro reference rates (via Frankfurter API)",
+      "url": "https://frankfurter.dev",
+      "coverage": "Daily since 1999-01-04; stored as monthly averages + latest daily",
+      "lastObservation": "2026-10-20",
+      "notes": "Cross rates between non-euro currencies are computed through the euro."
+    },
+    {
+      "id": "worldbank",
+      "name": "World Bank World Development Indicators (API v2)",
+      "url": "https://data.worldbank.org",
+      "coverage": "Annual, 1999–2026; FP.CPI.TOTL.ZG, NY.GDP.MKTP.KD.ZG, SL.UEM.TOTL.ZS, BN.CAB.XOKA.GD.ZS, FI.RES.TOTL.MO, FR.INR.RINR, PA.NUS.PRVT.PP, PA.NUS.FCRF",
+      "lastObservation": "2026",
+      "notes": "Price level ratio = PA.NUS.PRVT.PP ÷ PA.NUS.FCRF (derived; PA.NUS.PPPC.RF is archived). France data shown for the euro. WB last updated: 2026-10-08"
+    },
+    {
+      "id": "bigmac",
+      "name": "The Economist Big Mac Index",
+      "url": "https://github.com/TheEconomist/big-mac-data",
+      "coverage": "Semi-annual since 2000; euro area used for Paris",
+      "lastObservation": "2026-07-01",
+      "notes": "India uses the Maharaja Mac (chicken) in the Economist data."
+    },
+    {
+      "id": "bis",
+      "name": "Bank for International Settlements central bank policy rates (WS_CBPOL)",
+      "url": "https://data.bis.org/topics/CBPOL",
+      "coverage": "Monthly, end of period, since 1999; euro area for Paris",
+      "lastObservation": "2026-09",
+      "notes": "Real policy rate = annual average policy rate − CPI inflation (derived)."
+    }
+  ]
+}

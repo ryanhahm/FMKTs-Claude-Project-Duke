@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { PLACES } from '../src/data/places.ts';
 import { RAW_DIR, fetchText, log } from './lib/util.ts';
 
-export const BIS_POLICY = 'https://stats.bis.org/api/v2/data/dataflow/BIS/WS_CBPOL/1.0';
+import { BIS_POLICY } from '../src/data/sources.ts';
 
 async function main() {
   console.log('fetch-policy-rates: BIS WS_CBPOL');

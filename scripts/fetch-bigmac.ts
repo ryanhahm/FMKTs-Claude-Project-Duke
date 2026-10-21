@@ -3,7 +3,7 @@ import { writeFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { RAW_DIR, fetchText, log } from './lib/util.ts';
 
-export const BIGMAC_CSV = 'https://raw.githubusercontent.com/TheEconomist/big-mac-data/master/output-data/big-mac-full-index.csv';
+import { BIGMAC_CSV } from '../src/data/sources.ts';
 
 async function main() {
   console.log('fetch-bigmac: The Economist big-mac-data');

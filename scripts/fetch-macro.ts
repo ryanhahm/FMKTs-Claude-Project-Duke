@@ -4,7 +4,7 @@ import { PLACES } from '../src/data/places.ts';
 import { MACRO_INDICATORS, type MacroIndicatorKey } from '../src/data/types.ts';
 import { RAW_DIR, fetchJson, log, writeJson } from './lib/util.ts';
 
-export const WORLD_BANK = 'https://api.worldbank.org/v2';
+import { WORLD_BANK } from '../src/data/sources.ts';
 
 type WbPage = { page: number; pages: number; lastupdated?: string; message?: unknown };
 type WbRow = { countryiso3code: string; date: string; value: number | null };

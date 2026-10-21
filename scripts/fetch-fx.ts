@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { CURRENCIES } from '../src/data/places.ts';
 import { RAW_DIR, fetchJson, log, writeJson } from './lib/util.ts';
 
-export const FRANKFURTER = 'https://api.frankfurter.dev/v1';
+import { FRANKFURTER } from '../src/data/sources.ts';
 const START_YEAR = 1999;
 
 type Range = { rates: Record<string, Record<string, number>> };

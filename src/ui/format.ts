@@ -2,8 +2,9 @@ import type { Place } from '../data/places';
 
 const ZERO_DECIMAL = new Set(['JPY', 'KRW']);
 
-/** Exchange rates: 2 decimals below 10, 1 below 1,000, none above. */
+/** Exchange rates: 3 significant digits below 0.1, 2 decimals below 10, 1 below 1,000, none above. */
 export function formatRate(v: number): string {
+  if (v > 0 && v < 0.1) return v.toLocaleString('en-US', { maximumSignificantDigits: 3, minimumSignificantDigits: 3 });
   const digits = v < 10 ? 2 : v < 1000 ? 1 : 0;
   return v.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits });
 }

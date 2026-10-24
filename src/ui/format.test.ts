@@ -4,6 +4,7 @@ import { formatMoney, formatRate } from './format';
 
 describe('formatRate', () => {
   it('uses 2 decimals below 10', () => expect(formatRate(0.8917)).toBe('0.89'));
+  it('keeps 3 significant digits for tiny rates', () => expect(formatRate(0.0056312)).toBe('0.00563'));
   it('uses 1 decimal below 1,000', () => expect(formatRate(158.12)).toBe('158.1'));
   it('uses none above 1,000 with separators', () => expect(formatRate(1328.4)).toBe('1,328'));
 });

@@ -1,32 +1,60 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { loadMeta } from './data/load';
-import { PLACES } from './data/places';
+import { loadMeta, loadSnapshot } from './data/load';
 import { loadLatestRates } from './data/rates';
-import { convert, crossRate } from './finance/fx';
-import { useGame } from './state/useGame';
-import { Caption } from './ui/Caption';
-import { formatMoney, formatRate } from './ui/format';
-import { HudNumber } from './ui/HudNumber';
-import { TabBar, type TabId } from './ui/TabBar';
+import type { FxMonthly, Macro } from './data/types';
+import { placeById, useGame, type Screen } from './state/useGame';
+import CreatorScene from './three/scenes/CreatorScene';
+import GlobeScene from './three/scenes/GlobeScene';
+import { CITY_SCENES } from './three/scenes/registry';
+import { CityHud } from './ui/screens/CityHud';
+import { GlobeHud } from './ui/screens/GlobeHud';
+import { AmountScreen, CreateScreen, HomeScreen, TitleScreen } from './ui/screens/Onboarding';
 
-const ParisScene = lazy(() => import('./three/scenes/ParisScene'));
+function SceneFor({ screen, cityId }: { screen: Screen; cityId: string }) {
+  switch (screen) {
+    case 'create':
+      return <CreatorScene />;
+    case 'city': {
+      const City = CITY_SCENES[placeById(cityId).sceneId];
+      return City ? <City /> : <GlobeScene mode="explore" />;
+    }
+    case 'globe':
+      return <GlobeScene key="explore" mode="explore" intro />;
+    default:
+      return <GlobeScene key="title" mode="title" />;
+  }
+}
 
-const paris = PLACES.find((p) => p.id === 'paris')!;
+function Overlay({ screen }: { screen: Screen }) {
+  switch (screen) {
+    case 'title':
+      return <TitleScreen />;
+    case 'create':
+      return <CreateScreen />;
+    case 'home':
+      return <HomeScreen />;
+    case 'amount':
+      return <AmountScreen />;
+    case 'globe':
+      return <GlobeHud />;
+    case 'city':
+      return <CityHud />;
+  }
+}
 
 export default function App() {
-  const { profile, fxLatest, ratesLive, meta, setRates, setMeta } = useGame();
-  const [tab, setTab] = useState<TabId>('worth');
-  const home = PLACES.find((p) => p.id === profile.homeId)!;
-  const dest = paris;
+  const { screen, cityId, fading, fxLatest, ratesLive, meta, setRates, setData } = useGame();
 
   useEffect(() => {
     loadLatestRates().then(({ data, live }) => setRates(data, live)).catch(() => {});
-    loadMeta().then(setMeta).catch(() => {});
-  }, [setRates, setMeta]);
+    loadMeta().then((meta) => setData({ meta })).catch(() => {});
+    loadSnapshot<FxMonthly>('fx-monthly').then((fxMonthly) => setData({ fxMonthly })).catch(() => {});
+    loadSnapshot<Macro>('macro').then((macro) => setData({ macro })).catch(() => {});
+  }, [setRates, setData]);
 
-  const rate = fxLatest ? crossRate(fxLatest.rates, home.currency, dest.currency) : null;
-  const converted = fxLatest ? convert(profile.amount, fxLatest.rates, home.currency, dest.currency) : null;
+  // Home/amount steps keep the title globe spinning behind the panel.
+  const sceneScreen: Screen = screen === 'home' || screen === 'amount' ? 'title' : screen;
 
   return (
     <div className="relative h-full w-full overflow-hidden">
@@ -34,50 +62,35 @@ export default function App() {
         shadows="soft"
         flat
         dpr={[1, 2]}
-        camera={{ fov: 42, near: 0.1, far: 400, position: [-4, 5, 18] }}
-        onCreated={({ gl }) => {
-          // Dev-only hook for perf checks: window.__gl.info.render.{calls,triangles}
-          if (import.meta.env.DEV) (window as unknown as { __gl: unknown }).__gl = gl;
+        camera={{ fov: 42, near: 0.05, far: 400, position: [0, 0, 4] }}
+        onCreated={(state) => {
+          // Dev-only hooks for perf/debug checks: window.__gl.info.render.{calls,triangles}, window.__r3f.camera
+          if (import.meta.env.DEV) Object.assign(window, { __gl: state.gl, __r3f: state });
         }}
       >
         <Suspense fallback={null}>
-          <ParisScene />
+          <SceneFor screen={sceneScreen} cityId={cityId} />
         </Suspense>
       </Canvas>
 
-      <header className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between px-6 py-4">
-        <div className="hud-label text-white">Coin Atlas</div>
-      </header>
-
-      {rate !== null && converted !== null && (
-        <section className="absolute top-[16%] left-4 min-w-[220px] sm:left-[6vw] sm:max-w-[34vw]" aria-label="Exchange rate">
-          <HudNumber
-            top={`One ${home.currencyName}`}
-            value={rate}
-            bottom={`${dest.currencyPlural} today`}
-            format={formatRate}
-          />
-          <p className="hud-sub mt-5 text-white">
-            Your {formatMoney(profile.amount, home)} → {formatMoney(converted, dest)}
-          </p>
-          <p className="hud-sub-small mt-1 text-white/90">
-            1 {dest.currency} = {formatRate(1 / rate)} {home.currency}
-          </p>
-        </section>
+      {screen !== 'title' && (
+        <header className="pointer-events-none absolute top-0 left-0 px-6 py-4">
+          <div className="hud-label text-white">Coin Atlas</div>
+        </header>
       )}
 
-      {converted !== null && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-[22%] px-6 text-center">
-          <Caption text={`${dest.city}. Your ${profile.amount.toLocaleString('en-US')} ${home.currencyPlural.replace('U.S. ', '')} become ${Math.round(converted).toLocaleString('en-US')} ${dest.currencyPlural}.`} />
-        </div>
-      )}
+      <Overlay screen={screen} />
 
-      <TabBar active={tab} onChange={setTab} />
-
-      <footer className="hud-sub-small absolute right-4 bottom-2 text-right text-xs text-white">
+      <footer
+        className={`hud-sub-small pointer-events-none absolute right-4 bottom-2 text-right text-xs text-white ${
+          screen === 'create' || screen === 'home' || screen === 'amount' ? 'hidden' : ''
+        }`}
+      >
         Data last updated {meta ? new Date(meta.generatedAt).toLocaleDateString('en-US', { dateStyle: 'medium' }) : '—'}
         {fxLatest && <span className="hidden sm:inline"> · ECB rates {fxLatest.date}{ratesLive ? ' (live)' : ''}</span>}
       </footer>
+
+      <div className={`fade-veil ${fading ? 'fade-veil-on' : ''}`} aria-hidden="true" />
     </div>
   );
 }

@@ -139,7 +139,7 @@ export default function ParisScene() {
       ))}
       <Walker from={[0.55, 0.2, RIVER[1] + 1.2]} to={[0.55, 0.2, RIVER[0] - 1.2]} animate={!reduced} look={{ skin: '#E5B48C', hair: tokens.wood, hairStyle: 3, shirt: tokens.skyBlue, pants: '#4A5568' }} />
       {!reduced && <Particles color={tokens.sunGold} area={[26, 11, 20]} center={[0, 0.3, -1]} />}
-      <CameraRig position={[-5.5, 8.6, 24]} target={[-1.0, 3.6, -2.5]} drift={!reduced} />
+      <CameraRig position={[-5.5, 8.6, 24]} target={[-1.0, 3.6, -2.5]} drift={!reduced} introSeconds={reduced ? 0 : 1.1} />
     </>
   );
 }

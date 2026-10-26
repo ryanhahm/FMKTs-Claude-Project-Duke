@@ -1,8 +1,8 @@
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { loadMeta, loadSnapshot } from './data/load';
 import { loadLatestRates } from './data/rates';
-import type { FxMonthly, Macro } from './data/types';
+import type { BigMac, FxMonthly, Macro } from './data/types';
 import { placeById, useGame, type Screen } from './state/useGame';
 import CreatorScene from './three/scenes/CreatorScene';
 import GlobeScene from './three/scenes/GlobeScene';
@@ -10,6 +10,7 @@ import { CITY_SCENES } from './three/scenes/registry';
 import { CityHud } from './ui/screens/CityHud';
 import { GlobeHud } from './ui/screens/GlobeHud';
 import { AmountScreen, CreateScreen, HomeScreen, TitleScreen } from './ui/screens/Onboarding';
+import { AboutPanel, DataPanel } from './ui/Panels';
 
 function SceneFor({ screen, cityId }: { screen: Screen; cityId: string }) {
   switch (screen) {
@@ -44,13 +45,16 @@ function Overlay({ screen }: { screen: Screen }) {
 }
 
 export default function App() {
-  const { screen, cityId, fading, fxLatest, ratesLive, meta, setRates, setData } = useGame();
+  const { screen, cityId, fading, fxLatest, ratesLive, meta, setRates, setData, go } = useGame();
+  const [panel, setPanel] = useState<'data' | 'about' | null>(null);
+  const onboarding = screen === 'create' || screen === 'home' || screen === 'amount';
 
   useEffect(() => {
     loadLatestRates().then(({ data, live }) => setRates(data, live)).catch(() => {});
     loadMeta().then((meta) => setData({ meta })).catch(() => {});
     loadSnapshot<FxMonthly>('fx-monthly').then((fxMonthly) => setData({ fxMonthly })).catch(() => {});
     loadSnapshot<Macro>('macro').then((macro) => setData({ macro })).catch(() => {});
+    loadSnapshot<BigMac>('bigmac').then((bigmac) => setData({ bigmac })).catch(() => {});
   }, [setRates, setData]);
 
   // Home/amount steps keep the title globe spinning behind the panel.
@@ -81,9 +85,27 @@ export default function App() {
 
       <Overlay screen={screen} />
 
+      {!onboarding && (
+        <div className="absolute top-4 right-4 flex gap-2">
+          {screen === 'city' && (
+            <button className="btn-frosted" onClick={() => go('globe')}>
+              ← Globe
+            </button>
+          )}
+          <button className="btn-frosted" onClick={() => setPanel('data')}>
+            Data
+          </button>
+          <button className="btn-frosted" onClick={() => setPanel('about')}>
+            About
+          </button>
+        </div>
+      )}
+      {panel === 'data' && <DataPanel onClose={() => setPanel(null)} />}
+      {panel === 'about' && <AboutPanel onClose={() => setPanel(null)} />}
+
       <footer
         className={`hud-sub-small pointer-events-none absolute right-4 bottom-2 text-right text-xs text-white ${
-          screen === 'create' || screen === 'home' || screen === 'amount' ? 'hidden' : ''
+          onboarding || screen === 'city' ? 'hidden sm:block' : ''
         }`}
       >
         Data last updated {meta ? new Date(meta.generatedAt).toLocaleDateString('en-US', { dateStyle: 'medium' }) : '—'}

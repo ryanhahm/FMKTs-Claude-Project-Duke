@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { BackSide, Color, ShaderMaterial } from 'three';
 
 const vertexShader = /* glsl */ `
@@ -26,27 +26,29 @@ const fragmentShader = /* glsl */ `
   }
 `;
 
-/** Vertical gradient sky dome (no skybox image). */
-export function Sky({ top, mid, horizon, screenSpace = false }: { top: string; mid: string; horizon: string; screenSpace?: boolean }) {
-  const material = useMemo(
-    () =>
-      new ShaderMaterial({
-        vertexShader,
-        fragmentShader,
-        side: BackSide,
-        depthWrite: false,
-        fog: false,
-        uniforms: { uTop: { value: new Color() }, uMid: { value: new Color() }, uHorizon: { value: new Color() }, uScreen: { value: 0 } },
-      }),
-    [],
-  );
-  material.uniforms.uTop!.value.set(top);
-  material.uniforms.uMid!.value.set(mid);
-  material.uniforms.uHorizon!.value.set(horizon);
-  material.uniforms.uScreen!.value = screenSpace ? 1 : 0;
+export function createSkyMaterial(screenSpace: boolean): ShaderMaterial {
+  return new ShaderMaterial({
+    vertexShader,
+    fragmentShader,
+    side: BackSide,
+    depthWrite: false,
+    fog: false,
+    uniforms: { uTop: { value: new Color() }, uMid: { value: new Color() }, uHorizon: { value: new Color() }, uScreen: { value: screenSpace ? 1 : 0 } },
+  });
+}
+
+/** Vertical gradient sky dome (no skybox image). Colors are driven by Atmosphere. */
+export function Sky({ material }: { material: ShaderMaterial }) {
   return (
     <mesh material={material} renderOrder={-1} frustumCulled={false}>
       <sphereGeometry args={[150, 24, 12]} />
     </mesh>
   );
+}
+
+/** Convenience for static use. */
+export function useSkyMaterial(screenSpace: boolean) {
+  const m = useMemo(() => createSkyMaterial(screenSpace), [screenSpace]);
+  useEffect(() => () => m.dispose(), [m]);
+  return m;
 }

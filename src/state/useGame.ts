@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { skinTones, tokens } from '../design/tokens';
 import { PLACES, type Place } from '../data/places';
-import type { FxLatest, FxMonthly, Macro, Meta } from '../data/types';
+import type { BigMac, FxLatest, FxMonthly, Macro, Meta } from '../data/types';
 import type { CharacterLook } from '../three/Character';
 import { loadProfile, saveProfile } from './persist';
 
@@ -14,6 +14,9 @@ export type Profile = {
 };
 
 export type Screen = 'title' | 'create' | 'home' | 'amount' | 'globe' | 'city';
+export type TabId = 'worth' | 'buys' | 'timeline' | 'why';
+/** What the city scene should show, driven by the active tab. */
+export type SceneCue = { mood: number; crisis: boolean } | null;
 
 /** Half of a screen transition: fade to cream, swap, fade back (≈ 760ms total). */
 export const FADE_MS = 380;
@@ -31,12 +34,20 @@ type GameState = {
   fxMonthly: FxMonthly | null;
   macro: Macro | null;
   meta: Meta | null;
+  bigmac: BigMac | null;
+  tab: TabId;
+  /** Index into fxMonthly.months for the timeline tab. */
+  timelineIndex: number | null;
+  sceneCue: SceneCue;
+  setTab: (tab: TabId) => void;
+  setTimelineIndex: (i: number | null) => void;
+  setSceneCue: (cue: SceneCue) => void;
   go: (screen: Screen, cityId?: string) => void;
   updateProfile: (patch: Partial<Profile>) => void;
   /** Persist the profile (end of onboarding). */
   commitProfile: () => void;
   setRates: (fx: FxLatest, live: boolean) => void;
-  setData: (d: Partial<Pick<GameState, 'fxMonthly' | 'macro' | 'meta'>>) => void;
+  setData: (d: Partial<Pick<GameState, 'fxMonthly' | 'macro' | 'meta' | 'bigmac'>>) => void;
 };
 
 export const DEFAULT_PROFILE: Profile = {
@@ -60,10 +71,28 @@ export const useGame = create<GameState>((set, get) => ({
   fxMonthly: null,
   macro: null,
   meta: null,
+  bigmac: null,
+  tab: 'worth',
+  timelineIndex: null,
+  sceneCue: null,
+  setTab: (tab) => set({ tab, ...(tab !== 'timeline' ? { sceneCue: null } : {}) }),
+  setTimelineIndex: (timelineIndex) => set({ timelineIndex }),
+  setSceneCue: (sceneCue) => set({ sceneCue }),
   go: (screen, cityId) => {
     if (get().fading) return;
     set({ fading: true });
-    setTimeout(() => set({ screen, cityId: cityId ?? get().cityId, visitedCity: get().visitedCity || screen === 'city', fading: false }), FADE_MS);
+    setTimeout(
+      () =>
+        set({
+          screen,
+          cityId: cityId ?? get().cityId,
+          visitedCity: get().visitedCity || screen === 'city',
+          fading: false,
+          // Every city visit starts on the first tab, at today's date.
+          ...(screen === 'city' ? { tab: 'worth' as const, timelineIndex: null, sceneCue: null } : {}),
+        }),
+      FADE_MS,
+    );
   },
   updateProfile: (patch) => set((s) => ({ profile: { ...s.profile, ...patch } })),
   commitProfile: () => {

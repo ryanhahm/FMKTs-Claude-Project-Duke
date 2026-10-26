@@ -258,3 +258,109 @@ body { background: var(--color-ink); color: var(--color-cream); font-family: var
   .globe-card { animation: none; }
 }
 :focus-visible { outline: 2px solid var(--color-sun-gold); outline-offset: 2px; }
+
+/* ---------- M3: city tabs, panels ---------- */
+.glass {
+  background: rgba(42, 36, 32, 0.42);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 16px;
+  color: #fff;
+}
+.glass-title {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+.hud-column {
+  position: absolute;
+  top: max(72px, 14%);
+  left: 16px;
+  max-width: min(400px, 44vw);
+}
+@media (min-width: 640px) { .hud-column { left: 6vw; } }
+.side-panel {
+  position: absolute;
+  right: 16px;
+  top: 64px;
+  bottom: 108px;
+  width: min(400px, 44vw);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  padding-right: 2px;
+}
+.timeline-dock {
+  position: absolute;
+  left: 50%;
+  bottom: 100px;
+  width: min(780px, calc(100vw - 24px));
+  transform: translateX(-50%);
+}
+@media (max-width: 639px) {
+  .hud-column { top: 96px; max-width: calc(100vw - 32px); }
+  .hud-column .hud-number { font-size: 56px; }
+  .side-panel { left: 12px; right: 12px; top: auto; bottom: 88px; width: auto; max-height: 44vh; }
+  .timeline-dock { bottom: 88px; }
+}
+.estimate-tag {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #fff;
+  cursor: help;
+  white-space: nowrap;
+  text-shadow: none;
+}
+.push-pill {
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.16);
+  white-space: nowrap;
+}
+.push-up { background: rgba(242, 180, 90, 0.9); color: var(--color-ink); }
+.push-down { background: rgba(181, 83, 60, 0.92); color: #fff; }
+.btn-play {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 999px;
+  background: var(--color-sun-gold);
+  color: var(--color-ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+.timeline-slider { accent-color: var(--color-sun-gold); height: 28px; }
+.prose-panel { font-family: var(--font-sans); font-size: 14px; line-height: 1.55; }
+.prose-panel h2 { font-family: var(--font-serif); font-size: 22px; font-weight: 600; margin: 18px 0 6px; }
+.prose-panel p { margin: 6px 0; }
+.prose-panel ul { list-style: disc; padding-left: 20px; }
+.prose-panel li { margin: 6px 0; }
+.prose-panel a { color: var(--color-brick); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.prose-panel .muted { color: rgba(42, 36, 32, 0.68); font-size: 13px; }
+@media (max-height: 640px) {
+  .arrival-caption { display: none !important; }
+  .hud-column .hud-number { font-size: 56px; }
+}
+/* Soft readability glow behind the HUD (not a box): darkens the bright cream sky band just enough
+   for white small-caps labels to reach ~4.5:1. Design lead to confirm. */
+.hud-column::before {
+  content: '';
+  position: absolute;
+  inset: -60px -90px -60px -80px;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(42, 36, 32, 0.28), rgba(42, 36, 32, 0));
+  pointer-events: none;
+}

@@ -1,10 +1,11 @@
-export type TabId = 'worth' | 'buys' | 'timeline' | 'why';
+import type { TabId } from '../state/useGame';
+export type { TabId };
 
 const TABS: { id: TabId; label: string; short: string; ready: boolean }[] = [
   { id: 'worth', label: "What it's worth", short: 'Worth', ready: true },
-  { id: 'buys', label: 'What it buys', short: 'Buys', ready: false },
-  { id: 'timeline', label: 'Through the years', short: 'Years', ready: false },
-  { id: 'why', label: 'Why', short: 'Why', ready: false },
+  { id: 'buys', label: 'What it buys', short: 'Buys', ready: true },
+  { id: 'timeline', label: 'Through the years', short: 'Years', ready: true },
+  { id: 'why', label: 'Why', short: 'Why', ready: true },
 ];
 
 /** Frosted bottom tab bar (CLAUDE.md §2). Tabs B–D arrive in M3. */

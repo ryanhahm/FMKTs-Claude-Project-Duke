@@ -30,7 +30,7 @@ export function GlobeHud() {
         />
       </section>
 
-      <div className="absolute top-4 right-4 flex gap-2">
+      <div className="absolute top-16 right-4 flex gap-2">
         <button className="btn-frosted" onClick={() => setListOpen((o) => !o)} aria-expanded={listOpen} aria-controls="city-list">
           Cities
         </button>
@@ -40,7 +40,7 @@ export function GlobeHud() {
       </div>
 
       {listOpen && (
-        <nav id="city-list" className="panel absolute top-16 right-4 max-h-[70vh] w-[300px] overflow-y-auto !p-2" aria-label="All cities">
+        <nav id="city-list" className="panel absolute top-28 right-4 max-h-[70vh] w-[300px] overflow-y-auto !p-2" aria-label="All cities">
           <ul>
             {PLACES.filter((p) => p.id !== home.id).map((p) => {
               const s = quotes?.[p.id]?.strength;

@@ -36,3 +36,10 @@ export const PLACES: Place[] = [
 ];
 
 export const CURRENCIES = PLACES.map((p) => p.currency);
+
+/** Country name as it reads mid-sentence ("than in the U.S."). */
+export function countryInSentence(p: Pick<Place, 'country'>): string {
+  if (p.country === 'United States') return 'the U.S.';
+  if (p.country === 'United Kingdom') return 'the UK';
+  return p.country;
+}

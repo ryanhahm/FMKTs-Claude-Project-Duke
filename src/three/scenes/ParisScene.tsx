@@ -1,18 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import type { Group } from 'three';
 import { shades, tokens } from '../../design/tokens';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 import { mulberry32 } from '../../lib/rng';
-import { useGame } from '../../state/useGame';
-import { Atmosphere } from '../Atmosphere';
-import { Batched } from '../Batched';
 import { Builder } from '../builder';
-import { CameraRig } from '../CameraRig';
-import { Character, type CharacterLook, type Pose } from '../Character';
+import { Character, type CharacterLook } from '../Character';
+import { CityStage, type Pedestrian } from '../CityStage';
 import { eiffelTower } from '../landmarks/eiffel';
-import { GOLDEN_HOUR } from '../presets';
-import { Particles } from '../Particles';
 import { bench, cafeTerrace, haussmann, lamp, slab, tree } from '../props/props';
 
 /*
@@ -86,7 +81,7 @@ function buildParis(): Builder {
   return b;
 }
 
-const PEDESTRIANS: { pos: [number, number, number]; rot: number; look: CharacterLook; pose: Pose; phase: number }[] = [
+const PEDESTRIANS: Pedestrian[] = [
   { pos: [-9.3, 0, 8.2], rot: 0.4, pose: 'idle', phase: 1.3, look: { skin: '#C98E62', hair: tokens.ink, hairStyle: 1, shirt: tokens.dusk, pants: tokens.ink } },
   { pos: [-7.6, 0, 8.4], rot: -2.4, pose: 'idle', phase: 2.1, look: { skin: '#F3D2B3', hair: tokens.brick, hairStyle: 2, shirt: tokens.sage, pants: '#4A5568' } },
   { pos: [4.3, 0, 7.2], rot: Math.PI, pose: 'idle', phase: 0.7, look: { skin: '#7E4B2E', hair: tokens.ink, hairStyle: 0, shirt: tokens.terracotta, pants: tokens.ink } },
@@ -117,29 +112,14 @@ function Walker({ from, to, look, animate }: { from: [number, number, number]; t
 export default function ParisScene() {
   const reduced = useReducedMotion();
   const builder = useMemo(buildParis, []);
-  const look = useGame((s) => s.profile.look);
-  const [pose, setPose] = useState<Pose>('wave');
-  useEffect(() => {
-    const t = setTimeout(() => setPose('idle'), 2800);
-    return () => clearTimeout(t);
-  }, []);
-
   return (
-    <>
-      <Atmosphere preset={GOLDEN_HOUR} shadowExtent={19} />
-      <Batched builder={builder} />
+    <CityStage builder={builder} pedestrians={PEDESTRIANS} traveler={{ pos: [-1.6, 0, 6.6], rot: Math.PI - 0.55 }} basketAnchor={[-1.2, 0, 4.9]}>
       {/* Seine surface */}
       <mesh position={[0, -0.18, (RIVER[0] + RIVER[1]) / 2]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[26, RIVER[1] - RIVER[0] - 0.3]} />
         <meshStandardMaterial color={shades.water} flatShading roughness={0.55} metalness={0} />
       </mesh>
-      <Character look={look} pose={pose} position={[-1.6, 0, 6.6]} rotation={[0, Math.PI - 0.55, 0]} animate={!reduced} />
-      {PEDESTRIANS.map((p, i) => (
-        <Character key={i} look={p.look} pose={p.pose} phase={p.phase} position={p.pos} rotation={[0, p.rot, 0]} scale={0.95} animate={!reduced} />
-      ))}
       <Walker from={[0.55, 0.2, RIVER[1] + 1.2]} to={[0.55, 0.2, RIVER[0] - 1.2]} animate={!reduced} look={{ skin: '#E5B48C', hair: tokens.wood, hairStyle: 3, shirt: tokens.skyBlue, pants: '#4A5568' }} />
-      {!reduced && <Particles color={tokens.sunGold} area={[26, 11, 20]} center={[0, 0.3, -1]} />}
-      <CameraRig position={[-5.5, 8.6, 24]} target={[-1.0, 3.6, -2.5]} drift={!reduced} introSeconds={reduced ? 0 : 1.1} />
-    </>
+    </CityStage>
   );
 }

@@ -1,47 +1,56 @@
-import { useState } from 'react';
-import { convert, crossRate } from '../../finance/fx';
-import { placeById, useGame } from '../../state/useGame';
+import { lazy, Suspense } from 'react';
+import { useCityData } from '../../hooks/useCityData';
+import { useGame } from '../../state/useGame';
 import { Caption } from '../Caption';
-import { formatMoney, formatRate } from '../format';
-import { HudNumber } from '../HudNumber';
-import { TabBar, type TabId } from '../TabBar';
+import { TabBar } from '../TabBar';
+import { BuysHud, BuysPanel } from '../tabs/BuysTab';
+import { WhyPanel } from '../tabs/WhyTab';
+import { WorthTab } from '../tabs/WorthTab';
+
+// Recharts only loads when the timeline is opened.
+const TimelineHud = lazy(() => import('../tabs/TimelineTab').then((m) => ({ default: m.TimelineHud })));
+const TimelinePanel = lazy(() => import('../tabs/TimelineTab').then((m) => ({ default: m.TimelinePanel })));
 
 export function CityHud() {
-  const { profile, fxLatest, cityId, go } = useGame();
-  const [tab, setTab] = useState<TabId>('worth');
-  const home = placeById(profile.homeId);
-  const dest = placeById(cityId);
-  const rate = fxLatest ? crossRate(fxLatest.rates, home.currency, dest.currency) : null;
-  const converted = fxLatest ? convert(profile.amount, fxLatest.rates, home.currency, dest.currency) : null;
-  const sameCurrency = home.currency === dest.currency;
+  const { profile, tab, setTab } = useGame();
+  const d = useCityData();
+  if (!d) return null;
+  const { home, dest, converted, sameCurrency } = d;
+
+  const hud =
+    tab === 'worth' ? <WorthTab d={d} amount={profile.amount} /> : tab === 'buys' ? <BuysHud d={d} amount={profile.amount} /> : tab === 'timeline' ? <TimelineHud d={d} /> : null;
 
   return (
     <>
-      <button className="btn-frosted absolute top-4 right-4" onClick={() => go('globe')}>
-        ← Globe
-      </button>
-
-      {rate !== null && converted !== null && !sameCurrency && (
-        <section className="absolute top-[16%] left-4 min-w-[220px] sm:left-[6vw] sm:max-w-[34vw]" aria-label="Exchange rate">
-          <HudNumber top={`One ${home.currencyName}`} value={rate} bottom={`${dest.currencyPlural} today`} format={formatRate} />
-          <p className="hud-sub mt-5 text-white">
-            Your {formatMoney(profile.amount, home)} → {formatMoney(converted, dest)}
-          </p>
-          <p className="hud-sub-small mt-1 text-white/90">
-            1 {dest.currency} = {formatRate(1 / rate)} {home.currency}
-          </p>
+      {hud && (
+        <section className="hud-column" aria-label="City figures">
+          <Suspense fallback={null}>{hud}</Suspense>
         </section>
       )}
 
-      {converted !== null && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-[22%] px-6 text-center">
+      {tab === 'worth' && (
+        <div className="arrival-caption pointer-events-none absolute inset-x-0 bottom-[22%] hidden px-6 text-center sm:block">
           <Caption
             text={
               sameCurrency
-                ? `${dest.city}. Same currency as home — your ${formatMoney(profile.amount, home)} stays ${formatMoney(profile.amount, dest)}.`
+                ? `${dest.city}. Same currency as home.`
                 : `${dest.city}. Your ${profile.amount.toLocaleString('en-US')} ${home.currencyPlural.replace('U.S. ', '')} become ${Math.round(converted).toLocaleString('en-US')} ${dest.currencyPlural}.`
             }
           />
+        </div>
+      )}
+
+      {(tab === 'buys' || tab === 'why') && (
+        <aside className="side-panel" aria-label={tab === 'buys' ? 'Prices' : 'What moves this currency'}>
+          {tab === 'buys' ? <BuysPanel d={d} /> : <WhyPanel d={d} />}
+        </aside>
+      )}
+
+      {tab === 'timeline' && (
+        <div className="timeline-dock">
+          <Suspense fallback={null}>
+            <TimelinePanel d={d} />
+          </Suspense>
         </div>
       )}
 

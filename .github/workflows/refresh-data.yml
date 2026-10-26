@@ -8,6 +8,11 @@ on:
 permissions:
   contents: write
 
+# Never run two refreshes at once; a second one waits for the first.
+concurrency:
+  group: refresh-data
+  cancel-in-progress: false
+
 jobs:
   refresh:
     runs-on: ubuntu-latest
@@ -24,6 +29,16 @@ jobs:
           git config user.name "coin-atlas-bot"
           git config user.email "actions@users.noreply.github.com"
           git add public/data
-          if git diff --cached --quiet; then echo "No data changes"; exit 0; fi
+          # meta.json's timestamp changes on every run; only commit when actual data changed.
+          if ! git diff --cached --name-only | grep -qv '^public/data/meta.json$'; then
+            echo "No data changes"
+            exit 0
+          fi
           git commit -m "data: refresh snapshots $(date -u +%Y-%m-%d)"
-          git push
+          # Someone may have pushed while we were fetching; put our data commit on top and retry.
+          for attempt in 1 2 3; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            echo "Push attempt $attempt failed; retrying in 10s"
+            sleep 10
+          done
+          exit 1

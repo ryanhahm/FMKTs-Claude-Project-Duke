@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { loadMeta, loadSnapshot } from './data/load';
 import { loadLatestRates } from './data/rates';
@@ -11,11 +11,15 @@ import { CityHud } from './ui/screens/CityHud';
 import { GlobeHud } from './ui/screens/GlobeHud';
 import { AmountScreen, CreateScreen, HomeScreen, TitleScreen } from './ui/screens/Onboarding';
 import { AboutPanel, DataPanel } from './ui/Panels';
+import { ModesMenu } from './ui/ModesMenu';
+
+const CentralBankScreen = lazy(() => import('./ui/centralBank/CentralBankScreen'));
 
 function SceneFor({ screen, cityId }: { screen: Screen; cityId: string }) {
   switch (screen) {
     case 'create':
       return <CreatorScene />;
+    case 'centralBank':
     case 'city': {
       const City = CITY_SCENES[placeById(cityId).sceneId];
       return City ? <City /> : <GlobeScene mode="explore" />;
@@ -41,6 +45,12 @@ function Overlay({ screen }: { screen: Screen }) {
       return <GlobeHud />;
     case 'city':
       return <CityHud />;
+    case 'centralBank':
+      return (
+        <Suspense fallback={null}>
+          <CentralBankScreen />
+        </Suspense>
+      );
   }
 }
 
@@ -87,6 +97,7 @@ export default function App() {
 
       {!onboarding && (
         <div className="absolute top-4 right-4 flex gap-2">
+          {screen !== 'title' && <ModesMenu />}
           {screen === 'city' && (
             <button className="btn-frosted" onClick={() => go('globe')}>
               ← Globe
@@ -105,7 +116,7 @@ export default function App() {
 
       <footer
         className={`hud-sub-small pointer-events-none absolute right-4 bottom-2 text-right text-xs text-white ${
-          onboarding || screen === 'city' ? 'hidden sm:block' : ''
+          onboarding || screen === 'city' || screen === 'centralBank' ? 'hidden sm:block' : ''
         }`}
       >
         Data last updated {meta ? new Date(meta.generatedAt).toLocaleDateString('en-US', { dateStyle: 'medium' }) : '—'}

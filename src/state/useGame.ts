@@ -13,7 +13,7 @@ export type Profile = {
   amount: number;
 };
 
-export type Screen = 'title' | 'create' | 'home' | 'amount' | 'globe' | 'city';
+export type Screen = 'title' | 'create' | 'home' | 'amount' | 'globe' | 'city' | 'centralBank';
 export type TabId = 'worth' | 'buys' | 'timeline' | 'why';
 /** What the city scene should show, driven by the active tab. */
 export type SceneCue = { mood: number; crisis: boolean } | null;

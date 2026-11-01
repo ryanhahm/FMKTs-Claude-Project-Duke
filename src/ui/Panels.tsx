@@ -100,6 +100,34 @@ export function DataPanel({ onClose }: { onClose: () => void }) {
         </li>
         <li>Missing data is shown as “No data”, never as zero. Euro-area figures use France’s data.</li>
       </ul>
+      <h2>Central Bank mode: the model</h2>
+      <p>
+        A deliberately simplified teaching model, not a forecast. One turn = one quarter. Starting values come from the World Bank and BIS data above; the “world”
+        interest rate each quarter is the partner central bank’s actual BIS policy rate. Each quarter, with real rate = policy rate − expected inflation (expected
+        inflation is pulled toward the target in proportion to credibility):
+      </p>
+      <ul>
+        <li>
+          <b>Currency</b> rises with the real-rate gap vs the world, intervention to support it and current-account surpluses; it falls with money printing,
+          new debt, intervention to weaken it, and background pressure (safe-haven inflows or capital flight — a scenario assumption). Plus random noise and
+          events.
+        </li>
+        <li>
+          <b>Inflation</b> rises with an overheating economy, printing, a weaker currency (imported inflation), tariffs and buying foreign currency; it falls when
+          real rates are above neutral, and a credible central bank pulls it back toward target.
+        </li>
+        <li>
+          <b>Growth</b> falls when real rates are above neutral, when the currency strengthens (exports hurt) and with tariffs; printing boosts it.
+          Unemployment follows growth (Okun’s law).
+        </li>
+        <li>
+          <b>Reserves</b> fall when you support the currency and rise when you weaken it. Below 0.5 months of imports the currency is forcibly devalued 25%.
+        </li>
+        <li>
+          <b>Score</b> per quarter: 30% currency stability, 30% inflation near target, 20% jobs, 10% reserves, 10% approval. All coefficients are in
+          src/game/centralBank/config.ts; scenario assumptions (potential growth, neutral rate, natural unemployment, background pressure) are in scenarios.ts.
+        </li>
+      </ul>
       <h2>Historical events</h2>
       <ul>
         {EVENTS.map((e) => (

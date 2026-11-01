@@ -98,6 +98,11 @@ export function DataPanel({ onClose }: { onClose: () => void }) {
           <b>Timeline weather.</b> The selected month’s exchange rate ranked against every month since 1999 (percentile). Crisis months are the events listed
           below and the month after.
         </li>
+        <li>
+          <b>“Invest there” (carry trade).</b> Your amount converted at the chosen month’s exchange rate, earning the destination central bank’s policy rate
+          (BIS, as a stand-in for short-term deposit rates, compounded monthly), converted back at the latest monthly rate; compared with earning the home policy
+          rate. No taxes, fees or spreads. Worst drop = largest peak-to-trough fall of the invested amount in home currency.
+        </li>
         <li>Missing data is shown as “No data”, never as zero. Euro-area figures use France’s data.</li>
       </ul>
       <h2>Central Bank mode: the model</h2>

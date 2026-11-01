@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { skinTones, tokens } from '../design/tokens';
 import { PLACES, type Place } from '../data/places';
-import type { BigMac, FxLatest, FxMonthly, Macro, Meta } from '../data/types';
+import type { BigMac, FxLatest, FxMonthly, Macro, Meta, PolicyRates } from '../data/types';
 import type { CharacterLook } from '../three/Character';
 import { loadProfile, saveProfile } from './persist';
 
@@ -35,6 +35,7 @@ type GameState = {
   macro: Macro | null;
   meta: Meta | null;
   bigmac: BigMac | null;
+  policy: PolicyRates | null;
   tab: TabId;
   /** Index into fxMonthly.months for the timeline tab. */
   timelineIndex: number | null;
@@ -47,7 +48,7 @@ type GameState = {
   /** Persist the profile (end of onboarding). */
   commitProfile: () => void;
   setRates: (fx: FxLatest, live: boolean) => void;
-  setData: (d: Partial<Pick<GameState, 'fxMonthly' | 'macro' | 'meta' | 'bigmac'>>) => void;
+  setData: (d: Partial<Pick<GameState, 'fxMonthly' | 'macro' | 'meta' | 'bigmac' | 'policy'>>) => void;
 };
 
 export const DEFAULT_PROFILE: Profile = {
@@ -72,6 +73,7 @@ export const useGame = create<GameState>((set, get) => ({
   macro: null,
   meta: null,
   bigmac: null,
+  policy: null,
   tab: 'worth',
   timelineIndex: null,
   sceneCue: null,

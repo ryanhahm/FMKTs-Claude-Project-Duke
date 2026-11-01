@@ -3,12 +3,14 @@ import { createPortal } from 'react-dom';
 import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { tokens } from '../../design/tokens';
 import { eventsFor, type CurrencyEvent } from '../../data/events';
+import { carryFromData, carryTrade } from '../../finance/carry';
 import { crossSeries, moodAt, moodBand } from '../../finance/mood';
+import { currencyNoun } from '../../hooks/useStrengths';
 import type { CityData } from '../../hooks/useCityData';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 import { useGame } from '../../state/useGame';
 import { Caption } from '../Caption';
-import { formatRate } from '../format';
+import { formatMoney, formatRate } from '../format';
 import { HudNumber } from '../HudNumber';
 
 /** ECB reference rates (and the euro) start in January 1999. */
@@ -70,6 +72,82 @@ export function TimelineHud({ d }: { d: CityData }) {
   );
 }
 
+
+/** "Invest there": move money into the destination currency at the slider month, earn its interest, convert back today. */
+function CarryView({ d, startIndex, endIndex }: { d: CityData; startIndex: number; endIndex: number }) {
+  const { fxMonthly, policy, profile } = useGame();
+  const res = useMemo(() => {
+    if (!fxMonthly || !policy) return null;
+    const inp = carryFromData(fxMonthly, policy, d.home, d.dest);
+    return carryTrade({ amount: profile.amount, ...inp, start: startIndex, end: endIndex });
+  }, [fxMonthly, policy, d.home, d.dest, profile.amount, startIndex, endIndex]);
+
+  if (d.sameCurrency) return <p className="py-6 font-sans text-sm">Same currency as home — pick a city with a different currency to compare investing there.</p>;
+  if (!policy) return <p className="py-6 font-sans text-sm">Loading interest rates…</p>;
+  if (!res || res.months < 3) return <p className="py-6 font-sans text-sm">Move the slider to an earlier month (at least 3 months before today) — or there is no interest-rate data for that period.</p>;
+
+  const noun = currencyNoun(d.dest.currencyName);
+  const pct = (f: number) => `${f >= 1 ? '+' : '−'}${Math.abs((f - 1) * 100).toFixed(0)}%`;
+  const ann = (a: number) => `${a >= 0 ? '+' : '−'}${Math.abs(a * 100).toFixed(1)}%/yr`;
+  const gap = res.avgRateAbroad - res.avgRateHome;
+  const excess = res.abroad / res.home - 1;
+  let verdict: string;
+  if (gap > 0.5) {
+    if (excess > 0.05) verdict = `Paid off: ${d.dest.country}’s higher interest (about ${gap.toFixed(1)} points a year more) beat the ${noun}’s move. Textbook theory — uncovered interest parity — says the currency should fall just enough to cancel that gain. Here it didn’t.`;
+    else if (excess < -0.05) verdict = `Didn’t pay: the ${noun} fell by more than the extra ${gap.toFixed(1)} points a year of interest. High interest rates are often compensation for exactly this risk.`;
+    else verdict = `Roughly a wash: the ${noun}’s fall about cancelled the extra interest — just what uncovered interest parity predicts.`;
+  } else if (gap < -0.5) {
+    verdict = excess > 0.05 ? `Interest was lower there, but the ${noun} rose enough to win anyway.` : `Lower interest there, and no currency gain to make up for it.`;
+  } else verdict = `Interest rates were similar, so the currency move decided the result.`;
+
+  const chartData = res.path.map((p) => ({ m: p.m, abroad: +p.abroad.toFixed(2), home: +p.home.toFixed(2) }));
+  const win = res.abroad >= res.home;
+  return (
+    <div>
+      <p className="font-sans text-[13px] text-white/90">
+        {formatMoney(profile.amount, d.home)} moved into {d.dest.currencyPlural} in {monthLabel(res.path[0]!.m)}, earning {d.dest.country}’s interest rate, then converted back:
+      </p>
+      <div className="mt-1 grid grid-cols-2 gap-2">
+        <div className={`rounded-xl px-3 py-2 ${win ? 'bg-sun-gold/25' : 'bg-white/10'}`}>
+          <div className="font-sans text-[11px] font-semibold tracking-wide text-white/80 uppercase">Invested in {d.dest.city}</div>
+          <div className="font-sans text-2xl font-light">{formatMoney(res.abroad, d.home)}</div>
+          <div className="font-sans text-[11px] text-white/80">{ann(res.abroadAnnual)} {win ? '▲ better' : ''}</div>
+        </div>
+        <div className={`rounded-xl px-3 py-2 ${!win ? 'bg-sun-gold/25' : 'bg-white/10'}`}>
+          <div className="font-sans text-[11px] font-semibold tracking-wide text-white/80 uppercase">Kept at home</div>
+          <div className="font-sans text-2xl font-light">{formatMoney(res.home, d.home)}</div>
+          <div className="font-sans text-[11px] text-white/80">{ann(res.homeAnnual)} {!win ? '▲ better' : ''}</div>
+        </div>
+      </div>
+      <div className="mt-2 grid grid-cols-3 gap-2 font-sans text-[12px]">
+        <div><span className="text-white/70">Interest earned there</span><br /><b>{pct(res.interestFactor)}</b> <span className="text-white/70">(avg {res.avgRateAbroad.toFixed(1)}%/yr)</span></div>
+        <div><span className="text-white/70">Currency move</span><br /><b>{pct(res.fxFactor)}</b> <span className="text-white/70">({noun} vs {currencyNoun(d.home.currencyName)})</span></div>
+        <div><span className="text-white/70">Worst drop on the way</span><br /><b>−{(res.maxDrawdown * 100).toFixed(0)}%</b></div>
+      </div>
+      <div className="mt-2 h-[90px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: -8 }}>
+            <XAxis dataKey="m" tick={{ fill: 'rgba(255,255,255,0.75)', fontSize: 10 }} tickFormatter={(m: string) => m.slice(0, 4)} minTickGap={30} tickLine={false} axisLine={false} />
+            <YAxis tick={{ fill: 'rgba(255,255,255,0.75)', fontSize: 10 }} tickFormatter={(v: number) => `${d.home.symbol}${Math.round(v).toLocaleString("en-US")}`} width={60} domain={['auto', 'auto']} tickLine={false} axisLine={false} />
+            <Tooltip
+              formatter={(v, name) => [formatMoney(Number(v), d.home), name === 'abroad' ? `In ${d.dest.city}` : 'At home']}
+              labelFormatter={(m) => monthLabel(String(m))}
+              contentStyle={{ background: 'rgba(42,36,32,0.85)', border: 'none', borderRadius: 10, color: '#fff', fontSize: 12 }}
+            />
+            <Line dataKey="abroad" stroke={tokens.sunGold} strokeWidth={2.2} dot={false} isAnimationActive={false} />
+            <Line dataKey="home" stroke={tokens.cream} strokeWidth={1.6} strokeDasharray="4 3" dot={false} isAnimationActive={false} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+      <p className="mt-1 font-sans text-[13px] leading-snug">{verdict}</p>
+      <p className="mt-1 font-sans text-[10.5px] text-white/65">
+        Interest = central bank policy rate (BIS) as a stand-in for short-term deposit rates, compounded monthly; monthly average ECB exchange rates; no taxes,
+        fees or spreads. Past returns don’t predict future ones. Not financial advice.
+      </p>
+    </div>
+  );
+}
+
 export function TimelinePanel({ d }: { d: CityData }) {
   const t = useTimeline(d);
   const reduced = useReducedMotion();
@@ -77,6 +155,7 @@ export function TimelinePanel({ d }: { d: CityData }) {
   const setIdx = useGame((s) => s.setTimelineIndex);
   const setCue = useGame((s) => s.setSceneCue);
   const [playing, setPlaying] = useState(false);
+  const [mode, setMode] = useState<'rate' | 'carry'>('rate');
   const [caption, setCaption] = useState<CurrencyEvent | null>(null);
   const lastCaptionMonth = useRef<string | null>(null);
   const i = idx ?? t?.last ?? 0;
@@ -167,15 +246,38 @@ export function TimelinePanel({ d }: { d: CityData }) {
           document.body,
         )}
       <section className="glass p-3 sm:p-4" aria-label="Exchange rate through the years">
-        <div className="mb-1 flex items-center justify-between gap-2">
-          <h2 className="glass-title !mb-0">
-            {d.home.currency} → {d.dest.currency}, {t.fx.months[t.first]!.slice(0, 4)}–{t.fx.months[t.last]!.slice(0, 4)}
-          </h2>
+        <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex gap-1" role="tablist" aria-label="Timeline view">
+            {(['rate', 'carry'] as const).map((m) => (
+              <button
+                key={m}
+                role="tab"
+                aria-selected={mode === m}
+                className={`lever-chip !flex-none !px-3 !py-1 ${mode === m ? 'lever-chip-on' : ''}`}
+                onClick={() => {
+                  setPlaying(false);
+                  setMode(m);
+                  if (m === 'carry' && i >= t.last - 3) setIdx(Math.max(t.first, t.last - 120));
+                }}
+              >
+                {m === 'rate' ? 'Exchange rate' : 'Invest there'}
+              </button>
+            ))}
+          </div>
           <span className="font-sans text-[11px] text-white/70">
-            higher = stronger {d.home.currency}
-            {t.logScale ? ' · log scale' : ''}
+            {mode === 'rate' ? (
+              <>
+                {d.home.currency} → {d.dest.currency} · higher = stronger {d.home.currency}
+                {t.logScale ? ' · log scale' : ''}
+              </>
+            ) : (
+              'Slider = when you invest; held until today'
+            )}
           </span>
         </div>
+        {mode === 'carry' ? (
+          <CarryView d={d} startIndex={i} endIndex={t.last} />
+        ) : (
         <div className="h-[100px] sm:h-[120px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={t.data} margin={{ top: 6, right: 8, bottom: 0, left: -8 }}>
@@ -195,10 +297,13 @@ export function TimelinePanel({ d }: { d: CityData }) {
             </LineChart>
           </ResponsiveContainer>
         </div>
+        )}
         <div className="mt-2 flex items-center gap-3">
-          <button className="btn-play" onClick={play} aria-label={playing ? 'Pause' : 'Play through the years'}>
-            {playing ? '❚❚' : '▶'}
-          </button>
+          {mode === 'rate' && (
+            <button className="btn-play" onClick={play} aria-label={playing ? 'Pause' : 'Play through the years'}>
+              {playing ? '❚❚' : '▶'}
+            </button>
+          )}
           <input
             type="range"
             className="timeline-slider flex-1"
@@ -206,7 +311,7 @@ export function TimelinePanel({ d }: { d: CityData }) {
             max={t.last}
             step={1}
             value={i}
-            aria-label="Month"
+            aria-label={mode === 'carry' ? 'Month you invest' : 'Month'}
             aria-valuetext={monthLabel(month)}
             onChange={(e) => {
               setPlaying(false);
@@ -215,6 +320,7 @@ export function TimelinePanel({ d }: { d: CityData }) {
           />
           <span className="w-[72px] text-right font-sans text-xs font-semibold tabular-nums">{monthLabel(month)}</span>
         </div>
+        {mode === 'rate' && (
         <div className="mt-1.5 flex gap-x-3 overflow-x-auto font-sans text-[11px] whitespace-nowrap text-white/80" style={{ scrollbarWidth: 'none' }}>
           {t.events.map((e) => (
             <button
@@ -230,6 +336,7 @@ export function TimelinePanel({ d }: { d: CityData }) {
             </button>
           ))}
         </div>
+        )}
       </section>
     </>
   );

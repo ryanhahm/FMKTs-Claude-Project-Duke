@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { loadMeta, loadSnapshot } from './data/load';
 import { loadLatestRates } from './data/rates';
-import type { BigMac, FxMonthly, Macro } from './data/types';
+import type { BigMac, FxMonthly, Macro, PolicyRates } from './data/types';
 import { placeById, useGame, type Screen } from './state/useGame';
 import CreatorScene from './three/scenes/CreatorScene';
 import GlobeScene from './three/scenes/GlobeScene';
@@ -65,6 +65,7 @@ export default function App() {
     loadSnapshot<FxMonthly>('fx-monthly').then((fxMonthly) => setData({ fxMonthly })).catch(() => {});
     loadSnapshot<Macro>('macro').then((macro) => setData({ macro })).catch(() => {});
     loadSnapshot<BigMac>('bigmac').then((bigmac) => setData({ bigmac })).catch(() => {});
+    loadSnapshot<PolicyRates>('policy-rates').then((policy) => setData({ policy })).catch(() => {});
   }, [setRates, setData]);
 
   // Home/amount steps keep the title globe spinning behind the panel.

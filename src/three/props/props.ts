@@ -1,6 +1,7 @@
 /** Procedural blocky props, authored in local space and added to a Builder batch. */
 import { shades, tokens } from '../../design/tokens';
 import type { Builder, V3 } from '../builder';
+import { windowColor } from '../night';
 
 /** A floating ground chunk: colored top skin over earth sides (the "diorama" base). */
 export function slab(b: Builder, x0: number, x1: number, z0: number, z1: number, top: number, color: string, depth = 2.4) {
@@ -60,10 +61,10 @@ export function haussmann(b: Builder, position: V3, rotY: number, { width, depth
   for (let c = 0; c < cols; c++) {
     const x = -width / 2 + step * (c + 0.5);
     // shop windows / doors
-    b.box(tokens.ink, [x, 0.42, depth / 2 + 0.005], [step * 0.62, 0.6, 0.04]);
+    b.box(windowColor(c, 0), [x, 0.42, depth / 2 + 0.005], [step * 0.62, 0.6, 0.04]);
     for (let f = 1; f < floors; f++) {
       const y = GROUND + (f - 1) * FLOOR + 0.42;
-      b.box(tokens.ink, [x, y, depth / 2 + 0.005], [0.3, 0.48, 0.04]);
+      b.box(windowColor(c, f), [x, y, depth / 2 + 0.005], [0.3, 0.48, 0.04]);
     }
     if (c % 2 === 0) b.box(shades.limestone, [x, wallTop + 0.45, depth / 2 - 0.18], [0.26, 0.3, 0.2]);
     if (c % 3 === 1) b.box(tokens.terracotta, [x, wallTop + 1.05, -depth / 4], [0.2, 0.36, 0.2]);

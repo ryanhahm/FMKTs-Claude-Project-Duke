@@ -57,6 +57,19 @@ function Overlay({ screen }: { screen: Screen }) {
 export default function App() {
   const { screen, cityId, fading, fxLatest, ratesLive, meta, setRates, setData, go } = useGame();
   const [panel, setPanel] = useState<'data' | 'about' | null>(null);
+  // "Hide panels": just look at the scene (also the H key). Only where there is a scene worth looking at.
+  const [uiHidden, setUiHidden] = useState(false);
+  const canHide = screen === 'globe' || screen === 'city';
+  const hidden = uiHidden && canHide;
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement;
+      if (e.key.toLowerCase() !== 'h' || e.metaKey || e.ctrlKey || el.closest('input, textarea, select, [contenteditable]')) return;
+      setUiHidden((h) => !h);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
   const onboarding = screen === 'create' || screen === 'home' || screen === 'amount';
 
   useEffect(() => {
@@ -88,20 +101,32 @@ export default function App() {
         </Suspense>
       </Canvas>
 
-      {screen !== 'title' && (
+      {hidden && (
+        <button className="btn-frosted absolute right-4 bottom-4 z-20" onClick={() => setUiHidden(false)}>
+          Show panels
+        </button>
+      )}
+
+      {screen !== 'title' && !hidden && (
         <header className="pointer-events-none absolute top-0 left-0 px-6 py-4">
           <div className="hud-label text-white">Coin Atlas</div>
         </header>
       )}
 
-      <Overlay screen={screen} />
+      {!hidden && <Overlay screen={screen} />}
 
-      {!onboarding && (
-        <div className="absolute top-4 right-4 flex gap-2">
+      {!onboarding && !hidden && (
+        <div className="absolute top-4 right-4 flex max-w-[calc(100vw-150px)] flex-wrap justify-end gap-2">
           {screen !== 'title' && <ModesMenu />}
           {screen === 'city' && (
             <button className="btn-frosted" onClick={() => go('globe')}>
               ← Globe
+            </button>
+          )}
+          {canHide && (
+            <button className="btn-frosted" onClick={() => setUiHidden(true)} title="Hide panels (H)">
+              <span className="hidden sm:inline">Hide panels</span>
+              <span className="sm:hidden">Hide</span>
             </button>
           )}
           <button className="btn-frosted" onClick={() => setPanel('data')}>
@@ -117,7 +142,7 @@ export default function App() {
 
       <footer
         className={`hud-sub-small pointer-events-none absolute right-4 bottom-2 text-right text-xs text-white ${
-          onboarding || screen === 'city' || screen === 'centralBank' ? 'hidden sm:block' : ''
+          hidden ? 'hidden' : onboarding || screen === 'city' || screen === 'centralBank' ? 'hidden sm:block' : ''
         }`}
       >
         Data last updated {meta ? new Date(meta.generatedAt).toLocaleDateString('en-US', { dateStyle: 'medium' }) : '—'}

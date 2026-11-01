@@ -9,7 +9,10 @@ import type { Builder, V3 } from './builder';
 import { CameraRig } from './CameraRig';
 import { Character, type CharacterLook, type Pose } from './Character';
 import { Particles } from './Particles';
-import { GOLDEN_HOUR, presetForMood } from './presets';
+import { GOLDEN_HOUR, nightFor, presetForMood } from './presets';
+import { Birds, Boats, Traffic, Walker, type Lane } from './AmbientLife';
+import { NightLights } from './NightLights';
+import type { CityStyle } from './landmarks/cities';
 import { Rain } from './Rain';
 
 export type Pedestrian = { pos: V3; rot: number; look: CharacterLook; pose: Pose; phase: number };
@@ -20,11 +23,14 @@ type Props = {
   traveler: { pos: V3; rot: number };
   basketAnchor: V3;
   camera?: { position: V3; target: V3 };
+  traffic?: { lanes: Lane[]; kind: CityStyle['vehicle'] };
+  boats?: { z: number; y: number; x0?: number; x1?: number }[];
+  walkers?: { from: V3; to: V3; look: CharacterLook }[];
   children?: ReactNode;
 };
 
 /** Shared city diorama shell: mood-driven lighting, rain, crowd poses, basket props, traveler, camera. */
-export function CityStage({ builder, pedestrians, traveler, basketAnchor, camera, children }: Props) {
+export function CityStage({ builder, pedestrians, traveler, basketAnchor, camera, traffic, boats, walkers, children }: Props) {
   const reduced = useReducedMotion();
   const look = useGame((s) => s.profile.look);
   const tab = useGame((s) => s.tab);
@@ -60,9 +66,14 @@ export function CityStage({ builder, pedestrians, traveler, basketAnchor, camera
         />
       ))}
       <BasketProps visible={tab === 'buys'} anchor={basketAnchor} animate={!reduced} />
+      {traffic && <Traffic lanes={traffic.lanes} kind={traffic.kind} animate={!reduced} speedFactor={crisis ? 0.15 : 1} />}
+      {boats && <Boats lanes={boats} animate={!reduced} />}
+      {walkers?.map((w, i) => <Walker key={i} from={w.from} to={w.to} look={w.look} animate={!reduced && !crisis} />)}
+      <Birds animate={!reduced} count={rain > 0.5 ? 0 : 6} />
+      <NightLights night={cue ? nightFor(cue.mood) : 0} />
       {!reduced && rain < 0.4 && <Particles color={tokens.sunGold} area={[26, 11, 20]} center={[0, 0.3, -1]} />}
       {!reduced && <Rain intensity={rain} />}
-      <CameraRig position={cam.position} target={cam.target} drift={!reduced} introSeconds={reduced ? 0 : 1.1} />
+      <CameraRig position={cam.position} target={cam.target} drift={!reduced} introSeconds={reduced ? 0 : 1.1} lookAround />
     </>
   );
 }

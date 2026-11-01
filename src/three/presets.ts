@@ -64,6 +64,24 @@ export const MOOD_WEAK: ScenePreset = {
   hemiIntensity: 0.85,
 };
 
+/** Weakest months: night falls (moonlight, lit windows and lamps — see NightLights). */
+export const MOOD_NIGHT: ScenePreset = {
+  skyTop: '#1F2740',
+  skyMid: '#3A3F5C',
+  skyHorizon: '#6A5A6E',
+  fog: '#3B3E54',
+  fogDensity: 0.024,
+  sunColor: '#9FB0E0',
+  sunIntensity: 0.75,
+  sunPosition: [-8, 12, 6],
+  hemiSky: '#5A6488',
+  hemiGround: '#2E2833',
+  hemiIntensity: 0.6,
+};
+
+/** 0 = full daylight, 1 = full night. Night only falls in the weakest months. */
+export const nightFor = (mood: number) => Math.min(1, Math.max(0, (0.3 - mood) / 0.25));
+
 const COLOR_KEYS = ['skyTop', 'skyMid', 'skyHorizon', 'fog', 'sunColor', 'hemiSky', 'hemiGround'] as const;
 const a = new Color(), b = new Color();
 
@@ -77,10 +95,15 @@ export function lerpPreset(p: ScenePreset, q: ScenePreset, t: number): ScenePres
   return out;
 }
 
-/** Mood (0 weakest … 1 strongest) → lighting; crisis months thicken the fog and grey the sky. */
+/** Mood (0 weakest … 1 strongest) → lighting: night → dusk storm → daylight → golden sun. Crisis months thicken the fog. */
 export function presetForMood(mood: number, crisis: boolean): ScenePreset {
   const m = Math.min(1, Math.max(0, mood));
-  const base = m < 0.5 ? lerpPreset(MOOD_WEAK, MOOD_NEUTRAL, m / 0.5) : lerpPreset(MOOD_NEUTRAL, MOOD_STRONG, (m - 0.5) / 0.5);
+  const base =
+    m < 0.2
+      ? lerpPreset(MOOD_NIGHT, MOOD_WEAK, m / 0.2)
+      : m < 0.5
+        ? lerpPreset(MOOD_WEAK, MOOD_NEUTRAL, (m - 0.2) / 0.3)
+        : lerpPreset(MOOD_NEUTRAL, MOOD_STRONG, (m - 0.5) / 0.5);
   if (!crisis) return base;
   const grey = lerpPreset(base, MOOD_WEAK, 0.45);
   return { ...grey, fogDensity: Math.max(base.fogDensity, 0.026) * 1.3 };

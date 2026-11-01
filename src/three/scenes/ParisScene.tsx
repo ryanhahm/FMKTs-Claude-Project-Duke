@@ -1,11 +1,9 @@
-import { useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import type { Group } from 'three';
+import { useMemo } from 'react';
 import { shades, tokens } from '../../design/tokens';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 import { mulberry32 } from '../../lib/rng';
 import { Builder } from '../builder';
-import { Character, type CharacterLook } from '../Character';
+import { Walker } from '../AmbientLife';
 import { CityStage, type Pedestrian } from '../CityStage';
 import { eiffelTower } from '../landmarks/eiffel';
 import { bench, cafeTerrace, haussmann, lamp, slab, tree } from '../props/props';
@@ -88,32 +86,19 @@ const PEDESTRIANS: Pedestrian[] = [
   { pos: [-3.5, 0, -1.6], rot: 0.9, pose: 'idle', phase: 3.4, look: { skin: '#A86B45', hair: tokens.ink, hairStyle: 1, shirt: tokens.sunGold, pants: tokens.ink } },
 ];
 
-/** A pedestrian pacing back and forth between two points (crossing the bridge). */
-function Walker({ from, to, look, animate }: { from: [number, number, number]; to: [number, number, number]; look: CharacterLook; animate: boolean }) {
-  const ref = useRef<Group>(null);
-  const SPEED = 0.55; // units per second
-  const len = Math.hypot(to[0] - from[0], to[2] - from[2]);
-  useFrame(({ clock }) => {
-    const g = ref.current;
-    if (!g) return;
-    const d = animate ? (clock.elapsedTime * SPEED) % (2 * len) : len / 2;
-    const forward = d < len;
-    const k = (forward ? d : 2 * len - d) / len;
-    g.position.set(from[0] + (to[0] - from[0]) * k, from[1], from[2] + (to[2] - from[2]) * k);
-    g.rotation.y = Math.atan2(to[0] - from[0], to[2] - from[2]) + (forward ? 0 : Math.PI);
-  });
-  return (
-    <group ref={ref}>
-      <Character look={look} pose={animate ? 'walk' : 'idle'} scale={0.95} animate={animate} />
-    </group>
-  );
-}
-
 export default function ParisScene() {
   const reduced = useReducedMotion();
   const builder = useMemo(buildParis, []);
   return (
-    <CityStage builder={builder} pedestrians={PEDESTRIANS} traveler={{ pos: [-1.6, 0, 6.6], rot: Math.PI - 0.55 }} basketAnchor={[-1.2, 0, 4.9]}>
+    <CityStage
+      builder={builder}
+      pedestrians={PEDESTRIANS}
+      traveler={{ pos: [-1.6, 0, 6.6], rot: Math.PI - 0.55 }}
+      basketAnchor={[-1.2, 0, 4.9]}
+      traffic={{ lanes: [{ z: RIVER[0] - 0.7, dir: 1 }, { z: RIVER[1] + 0.75, dir: -1 }], kind: 'car' }}
+      boats={[{ z: (RIVER[0] + RIVER[1]) / 2 + 0.35, y: -0.2, x0: -11, x1: -2 }, { z: (RIVER[0] + RIVER[1]) / 2 - 0.35, y: -0.2, x0: 2, x1: 11 }]}
+      walkers={[{ from: [6, 0, 8.6], to: [-6, 0, 8.6], look: { skin: '#C98E62', hair: tokens.wood, hairStyle: 2, shirt: tokens.brick, pants: tokens.ink } }]}
+    >
       {/* Seine surface */}
       <mesh position={[0, -0.18, (RIVER[0] + RIVER[1]) / 2]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[26, RIVER[1] - RIVER[0] - 0.3]} />

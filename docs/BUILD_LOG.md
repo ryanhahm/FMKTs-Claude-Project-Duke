@@ -34,3 +34,8 @@
 - **Built:** A second view in "Through the years": move your money into the destination currency at any month since 1999, earn its central-bank rate (BIS, monthly compounding), convert back today; compared with earning the home rate, split into interest vs currency effect, annualised, with worst drawdown and a plain-English uncovered-interest-parity verdict. Pure, tested function (`src/finance/carry.ts`, 6 tests incl. the UIP-holds case → zero excess return).
 - **Expected:** A markets angle (returns and risk) to complement the macro content, since the project is graded by a finance professor.
 - **Actually:** Real data gives both outcomes: a U.S. investor putting $1,000 in lira in Jan 2010 earned +1,374% interest but lost 97% on the currency → $439 (vs $1,293 at home, −80% worst drop); the same trade in pesos → $1,945 (UIP failed — the "super peso" carry paid, with a 35% drawdown); yen → $584.
+
+## M5c — Immersion pass (2026-11-01)
+- **Built:** Ambient life (two-way traffic that nearly stops in a crisis, boats on every city's water, circling birds, strolling pedestrians); drag-to-look camera in cities; night falls in the weakest timeline months (moonlit preset, ~60% of windows and all street lamps glow); "Hide panels" button + H key; globe clouds and a soft atmospheric rim.
+- **Expected:** Moving props would blow the 150 draw-call budget.
+- **Actually:** Paris at night with rain, traffic and boats: 149 draw calls (incl. shadows), 17.7k triangles, 0.7 ms/frame on M-series — moving props skip the shadow pass; characters (~16 parts each) are now the main cost if we need to trim further. The first globe glow was a thick white halo; toned down to a thin rim.

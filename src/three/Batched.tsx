@@ -4,7 +4,7 @@ import type { Builder } from './builder';
 import { GEOMETRY, type GeometryKind } from './geometries';
 import { getMaterial } from './materials';
 
-function Batch({ id, matrices }: { id: string; matrices: Matrix4[] }) {
+function Batch({ id, matrices, shadows }: { id: string; matrices: Matrix4[]; shadows: boolean }) {
   const ref = useRef<InstancedMesh>(null);
   const [kind, color, glow] = id.split('|') as [GeometryKind, string, string];
   useLayoutEffect(() => {
@@ -19,18 +19,18 @@ function Batch({ id, matrices }: { id: string; matrices: Matrix4[] }) {
     <instancedMesh
       ref={ref}
       args={[GEOMETRY[kind], getMaterial(color, Number(glow)), matrices.length]}
-      castShadow={!glowing}
+      castShadow={shadows && !glowing}
       receiveShadow
     />
   );
 }
 
 /** Renders everything a Builder collected: one instanced draw call per (geometry, color). */
-export function Batched({ builder }: { builder: Builder }) {
+export function Batched({ builder, castShadow = true }: { builder: Builder; castShadow?: boolean }) {
   return (
     <>
       {[...builder.parts.entries()].map(([id, matrices]) => (
-        <Batch key={id} id={id} matrices={matrices} />
+        <Batch key={id} id={id} matrices={matrices} shadows={castShadow} />
       ))}
     </>
   );

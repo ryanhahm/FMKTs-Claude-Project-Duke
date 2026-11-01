@@ -4,10 +4,8 @@ import { mulberry32 } from '../../lib/rng';
 import { placeById, useGame } from '../../state/useGame';
 import { Builder } from '../builder';
 import { CityStage, type Pedestrian } from '../CityStage';
-import { block, cityTree, LANDMARKS, vehicle } from '../landmarks/cities';
+import { block, cityTree, LANDMARKS } from '../landmarks/cities';
 import { bench, lamp, slab } from '../props/props';
-
-const CAR_COLORS = [tokens.skyBlue, tokens.brick, tokens.cream, tokens.sage, '#4A5568', tokens.dusk];
 
 function buildCity(sceneId: string): Builder {
   const lm = LANDMARKS[sceneId]!;
@@ -23,8 +21,6 @@ function buildCity(sceneId: string): Builder {
   slab(b, -13, 13, 0, 10, 0, shades.gravel);
   b.box(shades.road, [0, 0.005, 1.2], [26, 0.02, 1.6]);
   for (let x = -12; x < 13; x += 2.2) b.box(tokens.cream, [x, 0.02, 1.2], [1.0, 0.01, 0.08]);
-  const vehicles: [number, number, number][] = [[-8, 0.85, Math.PI / 2], [5.5, 1.55, -Math.PI / 2], [10.5, 0.85, Math.PI / 2]];
-  vehicles.forEach(([x, z, r], i) => vehicle(b, x, z, i === 1 && style.vehicle === 'bus' ? 'bus' : style.vehicle === 'bus' ? 'car' : style.vehicle, style.vehicle === 'taxi' ? tokens.sunGold : CAR_COLORS[i % CAR_COLORS.length]!, r));
   for (const x of [-6, -2.2, 2.2, 6]) lamp(b, x, 2.4);
   for (const x of [-4.2, 4.2]) bench(b, x, 4.8, Math.PI);
   for (const x of [-11.5, -9.5, 9.5, 11.5]) cityTree(b, x, 3.4 + rand() * 4, style.tree, 1.7);
@@ -57,5 +53,17 @@ export default function GenericCityScene() {
   const cityId = useGame((s) => s.cityId);
   const sceneId = placeById(cityId).sceneId;
   const builder = useMemo(() => buildCity(sceneId), [sceneId]);
-  return <CityStage key={sceneId} builder={builder} pedestrians={PEDESTRIANS} traveler={{ pos: [-1.6, 0, 6.6], rot: Math.PI - 0.55 }} basketAnchor={[-1.2, 0, 4.9]} />;
+  const lm = LANDMARKS[sceneId]!;
+  return (
+    <CityStage
+      key={sceneId}
+      builder={builder}
+      pedestrians={PEDESTRIANS}
+      traveler={{ pos: [-1.6, 0, 6.6], rot: Math.PI - 0.55 }}
+      basketAnchor={[-1.2, 0, 4.9]}
+      traffic={{ lanes: [{ z: 0.85, dir: 1 }, { z: 1.55, dir: -1 }], kind: lm.style.vehicle }}
+      boats={lm.boats}
+      walkers={[{ from: [7, 0, 8.4], to: [-7, 0, 8.4], look: { skin: '#E5B48C', hair: tokens.wood, hairStyle: 3, shirt: tokens.skyBlue, pants: '#4A5568' } }]}
+    />
+  );
 }

@@ -16,6 +16,7 @@ import { Builder } from '../builder';
 import { Character } from '../Character';
 import { GEOMETRY } from '../geometries';
 import { GlobeMesh } from '../globe/GlobeMesh';
+import { GlobeClouds, GlobeGlow } from '../globe/GlobeAtmosphere';
 import { latLonToVec3 } from '../globe/geo';
 import { eiffelTower } from '../landmarks/eiffel';
 import { getMaterial } from '../materials';
@@ -258,6 +259,8 @@ export default function GlobeScene({ mode, intro = false }: Props) {
         autoRotateSpeed={explore ? 0.35 : 0.6}
       />
       <GlobeMesh onBackgroundClick={() => setSelected(null)} />
+      <GlobeGlow />
+      <GlobeClouds animate={!reduced} />
       {PLACES.map((p) => {
         const q = quotes?.[p.id];
         const isHome = p.id === home.id;

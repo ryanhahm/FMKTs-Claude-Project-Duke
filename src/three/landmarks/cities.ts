@@ -8,6 +8,7 @@ import { shades, tokens } from '../../design/tokens';
 import { mulberry32 } from '../../lib/rng';
 import type { Builder, V3 } from '../builder';
 import { slab, tree } from '../props/props';
+import { windowColor } from '../night';
 
 const BLOSSOM = '#E9AAA6';
 const ROCK = '#8C8A86';
@@ -26,7 +27,8 @@ export type CityStyle = {
   tree: 'round' | 'cone' | 'palm' | 'blossom';
 };
 
-export type Landmark = { build: (b: Builder) => void; style: CityStyle };
+/** `boats`: water lanes for moving boats (z, water surface y). */
+export type Landmark = { build: (b: Builder) => void; style: CityStyle; boats?: { z: number; y: number; x0?: number; x1?: number }[] };
 
 // ---------- shared helpers ----------
 export function landBack(b: Builder, color: string = shades.gravel, z1 = 0) {
@@ -47,7 +49,7 @@ export function block(b: Builder, pos: V3, rotY: number, w: number, d: number, f
   const cols = Math.max(1, Math.floor(w / 0.7));
   const step = w / cols;
   for (let f = 0; f < floors; f++)
-    for (let c = 0; c < cols; c++) b.box(tokens.ink, [-w / 2 + step * (c + 0.5), 0.75 + f * FLOOR, d / 2 + 0.005], [0.28, 0.42, 0.04]);
+    for (let c = 0; c < cols; c++) b.box(windowColor(c, f), [-w / 2 + step * (c + 0.5), 0.75 + f * FLOOR, d / 2 + 0.005], [0.28, 0.42, 0.04]);
   if (style.roof === 'gable') {
     b.box(style.roofColor, [0, h + 0.32, -d / 4 + 0.02], [w + 0.12, 0.08, d / 2 + 0.25], [0.55, 0, 0]);
     b.box(style.roofColor, [0, h + 0.32, d / 4 - 0.02], [w + 0.12, 0.08, d / 2 + 0.25], [-0.55, 0, 0]);
@@ -113,7 +115,7 @@ export const LANDMARKS: Record<string, Landmark> = {
       b.box(shades.zinc, [0, 11.2, 0], [0.4, 1.6, 0.4]);
       b.box(shades.zinc, [0, 12.6, 0], [0.1, 1.2, 0.1]);
       b.box(shades.glow, [0, 13.2, 0], [0.16, 0.16, 0.16], undefined, 1);
-      for (let f = 0; f < 14; f++) for (const x of [-0.6, 0, 0.6]) b.box(tokens.ink, [x, 0.6 + f * 0.7, 1.61], [0.22, 0.4, 0.03]);
+      for (let f = 0; f < 14; f++) for (const [k, x] of [-0.6, 0, 0.6].entries()) b.box(windowColor(k, f), [x, 0.6 + f * 0.7, 1.61], [0.22, 0.4, 0.03]);
       b.pop();
       // Chrysler-like crown
       b.push([-3.6, 0, -8]);
@@ -129,6 +131,7 @@ export const LANDMARKS: Record<string, Landmark> = {
     },
   },
   london: {
+    boats: [{ z: -11.2, y: -0.2 }],
     style: { walls: ['#A65A42', shades.limestone, '#B9765A', shades.limestoneShade], floors: [3, 6], roof: 'flat', roofColor: '#5E5A58', flank: true, vehicle: 'bus', tree: 'round' },
     build: (b) => {
       landBack(b);
@@ -151,7 +154,7 @@ export const LANDMARKS: Record<string, Landmark> = {
       // Palace of Westminster
       b.box(shades.limestoneShade, [-3.5, 1.6, -7.5], [10, 3.2, 3]);
       for (let i = 0; i < 12; i++) b.box(shades.limestone, [-8.2 + i * 0.85, 3.45, -6.05], [0.18, 0.5, 0.18]);
-      for (let i = 0; i < 10; i++) b.box(tokens.ink, [-8 + i * 0.95, 1.9, -5.99], [0.3, 1.2, 0.04]);
+      for (let i = 0; i < 10; i++) b.box(windowColor(i, 1), [-8 + i * 0.95, 1.9, -5.99], [0.3, 1.2, 0.04]);
       b.box(shades.limestoneShade, [-8.6, 3.5, -8], [1.6, 7, 1.6]);
       b.box('#4D5A55', [-8.6, 7.3, -8], [1.8, 0.6, 1.8]);
       // Thames
@@ -187,6 +190,7 @@ export const LANDMARKS: Record<string, Landmark> = {
     },
   },
   zurich: {
+    boats: [{ z: -5.2, y: -0.2, x0: -9, x1: 9 }, { z: -3.6, y: -0.2, x0: -6, x1: 10 }],
     style: { walls: [tokens.cream, shades.limestone, '#E8D6B0', '#DCC7A0'], floors: [3, 5], roof: 'gable', roofColor: tokens.brick, flank: false, vehicle: 'car', tree: 'cone' },
     build: (b) => {
       // Alps behind a lake, Grossmünster-like twin towers on the shore
@@ -214,6 +218,7 @@ export const LANDMARKS: Record<string, Landmark> = {
     },
   },
   istanbul: {
+    boats: [{ z: -11, y: -0.2 }],
     style: { walls: [tokens.cream, '#E3C9A0', '#D9B48C', shades.limestone], floors: [3, 5], roof: 'gable', roofColor: tokens.terracotta, flank: true, vehicle: 'car', tree: 'cone' },
     build: (b) => {
       landBack(b, shades.gravel, -0);
@@ -263,6 +268,7 @@ export const LANDMARKS: Record<string, Landmark> = {
     },
   },
   rio: {
+    boats: [{ z: -4, y: -0.2, x0: -11, x1: 0 }, { z: -3.2, y: -0.2, x0: 6, x1: 11 }],
     style: { walls: [WHITE, tokens.cream, '#E6E0D2', '#D8D2C4'], floors: [6, 12], roof: 'flat', roofColor: '#8E8A84', flank: false, vehicle: 'car', tree: 'palm' },
     build: (b) => {
       water(b, -12.5, -2.4);
@@ -282,6 +288,7 @@ export const LANDMARKS: Record<string, Landmark> = {
     },
   },
   mumbai: {
+    boats: [{ z: -9.5, y: -0.2 }],
     style: { walls: [tokens.cream, '#E3CFA8', '#D9C4A2', shades.limestone], floors: [4, 9], roof: 'flat', roofColor: '#8A7E70', flank: true, vehicle: 'car', tree: 'palm' },
     build: (b) => {
       slab(b, -13, 13, -8, 0, 0, shades.gravel);
@@ -341,6 +348,7 @@ export const LANDMARKS: Record<string, Landmark> = {
     },
   },
   sydney: {
+    boats: [{ z: -2.6, y: -0.2, x0: 2, x1: 11 }, { z: -9.5, y: -0.2, x0: -11, x1: 1 }],
     style: { walls: [tokens.cream, '#D9D4CC', shades.limestone, '#C8C2B8'], floors: [6, 12], roof: 'flat', roofColor: '#7C7874', flank: false, vehicle: 'car', tree: 'round' },
     build: (b) => {
       water(b, -12.5, -1.6);

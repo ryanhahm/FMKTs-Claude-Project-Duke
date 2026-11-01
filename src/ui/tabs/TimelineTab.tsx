@@ -11,7 +11,8 @@ import { Caption } from '../Caption';
 import { formatRate } from '../format';
 import { HudNumber } from '../HudNumber';
 
-const START = '2008-01';
+/** ECB reference rates (and the euro) start in January 1999. */
+const START = '1999-01';
 const PLAY_SECONDS = 8;
 const CAPTION_MS = 3000;
 
@@ -32,7 +33,10 @@ function useTimeline(d: CityData) {
     const last = fx.months.length - 1;
     const events = eventsFor(d.home.id, d.dest.id);
     const data = fx.months.slice(first).map((m, k) => ({ m, v: series[first + k] }));
-    return { fx, series, first, last, events, data };
+    // Currencies that moved more than 8× (e.g. the lira) get a log scale so equal % moves look equal.
+    const vals = data.map((d) => d.v).filter((v): v is number => v != null && v > 0);
+    const logScale = vals.length > 0 && Math.max(...vals) / Math.min(...vals) > 8;
+    return { fx, series, first, last, events, data, logScale };
   }, [fx, d.home, d.dest]);
 }
 
@@ -140,9 +144,15 @@ export function TimelinePanel({ d }: { d: CityData }) {
 
   return (
     <>
+      {createPortal(
+        <div className="year-mark pointer-events-none fixed inset-x-0 top-[5.5rem] z-[5] text-center" aria-hidden="true">
+          {month.slice(0, 4)}
+        </div>,
+        document.body,
+      )}
       {caption &&
         createPortal(
-        <div className="pointer-events-none fixed inset-x-0 top-[12%] z-10 px-6 text-center">
+        <div className="pointer-events-none fixed inset-x-0 top-[22%] z-10 px-6 text-center">
           <Caption text={caption.caption} />
           <a
             href={caption.sourceUrl}
@@ -161,14 +171,17 @@ export function TimelinePanel({ d }: { d: CityData }) {
           <h2 className="glass-title !mb-0">
             {d.home.currency} → {d.dest.currency}, {t.fx.months[t.first]!.slice(0, 4)}–{t.fx.months[t.last]!.slice(0, 4)}
           </h2>
-          <span className="font-sans text-[11px] text-white/70">higher = stronger {d.home.currency}</span>
+          <span className="font-sans text-[11px] text-white/70">
+            higher = stronger {d.home.currency}
+            {t.logScale ? ' · log scale' : ''}
+          </span>
         </div>
         <div className="h-[100px] sm:h-[120px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={t.data} margin={{ top: 6, right: 8, bottom: 0, left: -8 }}>
               <CartesianGrid stroke="rgba(255,255,255,0.15)" vertical={false} />
-              <XAxis dataKey="m" tick={{ fill: 'rgba(255,255,255,0.8)', fontSize: 10 }} tickFormatter={(m: string) => m.slice(0, 4)} interval={23} tickLine={false} axisLine={false} />
-              <YAxis domain={['auto', 'auto']} tick={{ fill: 'rgba(255,255,255,0.8)', fontSize: 10 }} tickFormatter={(v: number) => formatRate(v)} width={52} tickLine={false} axisLine={false} />
+              <XAxis dataKey="m" tick={{ fill: 'rgba(255,255,255,0.8)', fontSize: 10 }} tickFormatter={(m: string) => m.slice(0, 4)} interval={35} tickLine={false} axisLine={false} />
+              <YAxis scale={t.logScale ? 'log' : 'auto'} domain={t.logScale ? ['dataMin', 'dataMax'] : ['auto', 'auto']} allowDataOverflow tick={{ fill: 'rgba(255,255,255,0.8)', fontSize: 10 }} tickFormatter={(v: number) => formatRate(v)} width={52} tickLine={false} axisLine={false} />
               <Tooltip
                 formatter={(v) => [formatRate(Number(v)), `${d.dest.currency} per ${d.home.currency}`]}
                 labelFormatter={(m) => monthLabel(String(m))}

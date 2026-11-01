@@ -1,6 +1,7 @@
 /**
  * Historical currency events for the timeline (CLAUDE.md §6.2 Tab C).
- * Every source URL was checked to resolve on 2026-10-26. Captions ≤ 12 words.
+ * Every source URL was checked to resolve (2026-10-26; pre-2008 events 2026-11-01), and every event's currency
+ * move was checked against the ECB data. Captions ≤ 12 words.
  * `places`: ["*"] = global, otherwise place ids; an event shows when the home OR the destination matches.
  * `crisis`: thickens fog and makes pedestrians huddle while the playhead is on that month.
  */
@@ -14,6 +15,36 @@ export type CurrencyEvent = {
 };
 
 export const EVENTS: CurrencyEvent[] = [
+  {
+    date: '1999-01', places: ['paris'], crisis: false,
+    title: 'The euro is launched',
+    caption: 'January 1999. The euro is born.',
+    sourceUrl: 'https://www.ecb.europa.eu/euro/intro/html/index.en.html',
+  },
+  {
+    date: '2001-02', places: ['istanbul'], crisis: true,
+    title: 'Turkish banking crisis',
+    caption: 'February 2001. A banking crisis; the lira loses almost half its value.',
+    sourceUrl: 'https://en.wikipedia.org/wiki/2001_Turkish_economic_crisis',
+  },
+  {
+    date: '2001-12', places: ['cape-town'], crisis: true,
+    title: 'Rand hits a record low',
+    caption: 'December 2001. The rand hits a record low against the dollar.',
+    sourceUrl: 'https://en.wikipedia.org/wiki/South_African_rand',
+  },
+  {
+    date: '2002-10', places: ['rio'], crisis: true,
+    title: 'Election jitters hit the real',
+    caption: 'October 2002. Election jitters; the Brazilian real slumps.',
+    sourceUrl: 'https://en.wikipedia.org/wiki/Brazilian_real',
+  },
+  {
+    date: '2007-08', places: ['*'], crisis: false,
+    title: 'Credit crunch begins',
+    caption: 'August 2007. Mortgage losses start to freeze credit markets.',
+    sourceUrl: 'https://www.federalreservehistory.org/essays/great-recession-and-its-aftermath',
+  },
   {
     date: '2008-09', places: ['*'], crisis: true,
     title: 'Lehman Brothers collapses',

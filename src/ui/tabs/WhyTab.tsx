@@ -45,7 +45,7 @@ function FactorCard({ f, homeLabel, destCurrency, homeIsDest }: { f: Factor; hom
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="font-sans text-[13px] font-semibold tracking-wide text-white/85 uppercase">{f.title}</h3>
-          <div className="font-serif text-3xl leading-tight">
+          <div className="font-sans text-3xl leading-tight">
             {f.value ? (
               <>
                 {fmt(f.value.value)}
@@ -97,7 +97,7 @@ export function WhyPanel({ d }: { d: CityData }) {
     <div className="space-y-3">
       <section className="glass p-4">
         <h2 className="glass-title">What moves the {currencyNoun(dest.currencyName)}</h2>
-        <p className="font-serif text-[19px] leading-snug italic">{summary}</p>
+        <p className="font-sans text-[19px] leading-snug">{summary}</p>
         <p className="mt-2 font-sans text-[11px] text-white/70">
           Simple rules of thumb, not a forecast. Annual World Bank data (latest year shown); real rate = BIS policy rate − CPI inflation
           {dest.id === 'paris' ? '; euro shown with France’s data' : ''}.

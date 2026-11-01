@@ -139,7 +139,7 @@ function MarkerCard({ place, home, quote, onVisit, onHold }: {
         onPointerEnter={() => onHold(true)}
         onPointerLeave={() => onHold(false)}
       >
-        <div className="font-serif text-2xl leading-tight font-semibold text-ink">{place.city}</div>
+        <div className="font-sans text-2xl leading-tight font-semibold text-ink">{place.city}</div>
         <div className="text-xs font-medium tracking-wide text-ink/70 uppercase">{place.country}</div>
         {quote && !isHome && (
           <div className="mt-2 font-sans text-sm font-semibold text-ink">

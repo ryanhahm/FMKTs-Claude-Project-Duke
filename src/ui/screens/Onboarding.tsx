@@ -19,7 +19,7 @@ const HAIR_STYLES: { id: HairStyle; label: string }[] = [
 
 function Steps({ step }: { step: 1 | 2 | 3 }) {
   return (
-    <div className="mb-3 font-sans text-xs font-semibold tracking-[0.2em] text-ink/55 uppercase">
+    <div className="mb-3 font-sans text-xs font-semibold tracking-wide text-ink/55 uppercase">
       Step {step} of 3
     </div>
   );
@@ -202,7 +202,7 @@ export function AmountScreen() {
           Amount in {home.currencyPlural}
         </label>
         <div className="money-input">
-          <span className="font-serif text-2xl text-ink/70">{home.symbol}</span>
+          <span className="font-sans text-2xl text-ink/70">{home.symbol}</span>
           <input
             id="amount"
             inputMode="decimal"
@@ -210,7 +210,7 @@ export function AmountScreen() {
             value={text}
             aria-invalid={!valid}
             onChange={(e) => setText(e.target.value)}
-            className="w-full bg-transparent font-serif text-3xl text-ink outline-none"
+            className="w-full bg-transparent font-sans text-3xl text-ink outline-none"
           />
           <span className="font-sans text-sm font-semibold text-ink/55">{home.currency}</span>
         </div>

@@ -14,7 +14,7 @@ export function wordGroups(text: string, maxWords = 3): string[] {
   return groups;
 }
 
-/** Large serif-italic narrative caption over the scene; word groups fade/slide in 40ms apart. */
+/** Large serif-narrative caption over the scene; word groups fade/slide in 40ms apart. */
 export function Caption({ text, className = '' }: { text: string; className?: string }) {
   return (
     <p key={text} className={`caption ${className}`} aria-live="polite">

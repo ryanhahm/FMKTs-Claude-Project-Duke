@@ -44,7 +44,7 @@ function Dashboard({ s, prev, target }: { s: EconState; prev: EconState | null; 
         return (
           <div key={m.key} className="rounded-xl bg-white/10 px-3 py-2">
             <div className="font-sans text-[11px] font-semibold tracking-wide text-white/75 uppercase">{m.label}</div>
-            <div className="font-serif text-2xl leading-none">
+            <div className="font-sans text-2xl leading-none">
               {fmt(v, m.key === 'credibility' || m.key === 'approval' ? 0 : 1)}
               <span className="ml-1 font-sans text-[11px] text-white/70">{m.unit}</span>
             </div>
@@ -284,7 +284,7 @@ export default function CentralBankScreen() {
     return (
       <div className="absolute inset-0 flex items-end justify-center overflow-y-auto p-4 sm:items-center">
         <div className="panel w-full max-w-[760px]">
-          <div className="mb-2 font-sans text-xs font-semibold tracking-[0.2em] text-ink/55 uppercase">Central Bank mode</div>
+          <div className="mb-2 font-sans text-xs font-semibold tracking-wide text-ink/55 uppercase">Central Bank mode</div>
           <h1 className="panel-title">Run a central bank through a real crisis</h1>
           <p className="mb-3 font-sans text-sm text-ink/75">
             Eight quarters. Four levers. Real starting data. Your goal is not the strongest currency — it’s a stable one: steady prices, jobs, and a currency that
@@ -294,7 +294,7 @@ export default function CentralBankScreen() {
             {SCENARIOS.map((s) => (
               <button key={s.id} className="place-card !items-start !py-3" onClick={() => choose(s)}>
                 <span className="text-left">
-                  <span className="block font-serif text-xl leading-tight font-semibold">{s.title}</span>
+                  <span className="block font-sans text-xl leading-tight font-semibold">{s.title}</span>
                   <span className="block font-sans text-xs opacity-75">
                     {s.country} · {s.period} · {s.difficulty}
                   </span>
@@ -314,8 +314,8 @@ export default function CentralBankScreen() {
           <div className="hud-label text-white/85">
             {def.country} · {def.period}
           </div>
-          <h1 className="mb-2 font-serif text-4xl leading-tight font-semibold italic">{def.title}</h1>
-          <p className="font-serif text-[20px] leading-snug">{def.intro}</p>
+          <h1 className="mb-2 font-sans text-4xl leading-tight font-semibold">{def.title}</h1>
+          <p className="font-sans text-[20px] leading-snug">{def.intro}</p>
           {prepared ? (
             <>
               <div className="mt-4">
@@ -385,14 +385,14 @@ export default function CentralBankScreen() {
         <section className="glass p-5">
           <div className="hud-label text-white/85">Your term · {def2.title}</div>
           <div className="flex items-end gap-4">
-            <div className="font-serif text-[96px] leading-none">{sum.grade}</div>
+            <div className="font-sans text-[96px] leading-none">{sum.grade}</div>
             <div className="pb-3 font-sans text-sm text-white/85">
               Score {sum.score.toFixed(0)}/100
               <br />
               Seed {game.seed}
             </div>
           </div>
-          <p className="mt-2 font-serif text-2xl leading-snug italic">{sum.lesson}</p>
+          <p className="mt-2 font-sans text-2xl leading-snug">{sum.lesson}</p>
           <ul className="mt-3 space-y-0.5 font-sans text-[13px] text-white/90">
             <li>
               Currency: {sum.fxTotalPct >= 0 ? '▲' : '▼'} {Math.abs(sum.fxTotalPct).toFixed(1)}% over two years

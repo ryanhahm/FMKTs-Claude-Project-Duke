@@ -15,9 +15,9 @@ export const tokens = {
 
 export type TokenName = keyof typeof tokens;
 
+/** One system font for everything. */
 export const fonts = {
-  serif: '"Cormorant Garamond", Georgia, serif',
-  sans: 'Inter, system-ui, sans-serif',
+  ui: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
 } as const;
 
 /**

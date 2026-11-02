@@ -30,7 +30,7 @@ export function TitleScreen() {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-between px-6 pt-[14vh] pb-[12vh] text-center">
       <div>
-        <div className="hud-label mb-4 text-white">Coin Atlas</div>
+        <div className="hud-label mb-4 text-white">Parity</div>
         <Caption text="How far does your money really go?" className="max-w-[16ch] sm:max-w-none" />
       </div>
       <div className="flex flex-col items-center gap-3">

@@ -44,3 +44,8 @@
 - **Built:** An 8-step first-run tour (`src/ui/Tour.tsx`) that drives the app itself: globe HUD and legend → Paris (Tokyo for euro travelers) → each of the four tabs (the timeline jumps to Sept 2008 so night, rain and the Lehman caption show) → Modes/Central Bank → Data. Rings the control it describes; Back / Next / Skip / Esc; seen-flag in localStorage; replay from the globe's Tour button.
 - **Expected:** A centered card would work everywhere.
 - **Actually:** Every screen region is already used by a HUD or panel, so the card is placed per step (right, left or bottom-left), and on phones it goes to whichever half the highlighted control isn't in. Testing also exposed a pre-existing phone overlap (wrapped header buttons sat on the globe's Cities row) and a focus-scroll of the clipped app container; both fixed.
+
+## M5e — Rename (2026-11-02)
+- **Built:** Renamed the app from "Coin Atlas" to **Parity** (title, header, About, tour, README, submission).
+- **Expected:** A name that says something about the finance inside.
+- **Actually:** One-line change per file; storage keys kept so returning players' travelers survive.

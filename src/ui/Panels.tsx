@@ -150,9 +150,9 @@ export function DataPanel({ onClose }: { onClose: () => void }) {
 
 export function AboutPanel({ onClose }: { onClose: () => void }) {
   return (
-    <Modal title="About Coin Atlas" onClose={onClose}>
+    <Modal title="About Parity" onClose={onClose}>
       <p>
-        Coin Atlas is a small game about international finance: what your money is worth abroad, what it actually buys, how that has changed over time, and
+        Parity is a small game about international finance: what your money is worth abroad, what it actually buys, how that has changed over time, and
         why currencies move. It uses real, regularly updated data from the European Central Bank, the World Bank, the Bank for International Settlements and
         The Economist.
       </p>

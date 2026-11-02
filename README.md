@@ -1,4 +1,4 @@
-# Coin Atlas
+# Parity
 
 How far does your money really go? A low-poly 3D explorer of exchange rates, purchasing power, inflation and monetary policy. FMKT 256 (Duke, Fall 2026). See `CLAUDE.md` for the full brief.
 

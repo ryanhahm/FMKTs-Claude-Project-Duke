@@ -19,7 +19,7 @@ type Step = {
 function steps(home: string, dest: string): Step[] {
   return [
     {
-      screen: 'globe', target: 'carrying', title: 'Welcome to Coin Atlas',
+      screen: 'globe', target: 'carrying', title: 'Welcome to Parity',
       body: `See how far your ${home} go around the world. Every number comes from real data: ECB exchange rates, World Bank prices and BIS interest rates.`,
     },
     {

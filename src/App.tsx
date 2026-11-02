@@ -116,7 +116,7 @@ export default function App() {
 
       {screen !== 'title' && !hidden && (
         <header className="pointer-events-none absolute top-0 left-0 px-6 py-4">
-          <div className="hud-label text-white">Coin Atlas</div>
+          <div className="hud-label text-white">Parity</div>
         </header>
       )}
 

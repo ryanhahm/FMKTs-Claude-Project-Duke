@@ -1,6 +1,6 @@
-# Coin Atlas — Project Brief for Claude Code
+# Parity — Project Brief for Claude Code
 
-> Working title: **Coin Atlas** (rename freely). An international-finance simulator and visualization game.
+> Name: **Parity** (renamed from "Coin Atlas" on 2026-11-02). An international-finance simulator and visualization game.
 > Course: FMKT 256 Extra Credit Project on AI (Duke, Fall 2026), Prompt #1 — "Build a finance app."
 > **Hard deadline: Tuesday, November 3, 2026 at 1:00pm ET** (submitted as a PDF with a public link).
 > Team: 3–4 students. Built with Claude Code. Target: a polished, public web app that also works as a product design / PM portfolio piece.
@@ -443,3 +443,4 @@ Generated as `docs/submission.md`, then exported to PDF by the team. Must includ
 - 2026-11-01 (M4): Hosting = **GitHub Pages** via `.github/workflows/deploy-pages.yml` (push to main + after each `Refresh data` run; Vite `base: './'`). Live: https://ryanhahm.github.io/FMKTs-Claude-Project-Duke/. **Central Bank model deviations from §6.3 (tuning, all in `config.ts`):** real rate uses expected inflation = credibility-weighted mix of target and current inflation; inflation anchoring 0.2 × credibility × (target − inflation); real-rate-gap effects capped at ±6pt; fx debt term uses debt *added since start* (0.15 per pt) instead of debt level vs 60% (no clean comparable source; Japan); buying foreign currency adds 0.3pt inflation per level (unsterilised). Scenario `fxDrift` (background safe-haven/capital-flight pressure) and potential growth / neutral rate / natural unemployment are labelled model assumptions. Schedule cuts: office diorama (city scene behind the levers instead), Trip mode, 1992 scenario, Blender landmarks, post-processing.
 - 2026-11-01 (M5): **Typography changed by team request:** one system font stack (`-apple-system, Segoe UI, Roboto…`) for everything, no italics, no Google Fonts — overrides §2 Typography. **Timeline starts Jan 1999** (full ECB history; overrides §6.2's 2008 start), with log scale when a pair moved >8×, a large year label, and 22 sourced events. FX snapshots verified against ECB Data Portal monthly averages (EXR M.*.EUR.SP00.A): identical to rounding.
 - 2026-11-01 (M5): Added **"Invest there" carry-trade view** (Timeline tab toggle) to give the app a financial-markets angle (returns, risk, uncovered interest parity). Short-term rate proxy = BIS policy rate; no taxes/fees/spreads; labelled "not financial advice".
+- 2026-11-02: **Renamed to Parity** (team found "Coin Atlas" odd) — after purchasing power parity and interest parity, the app's two core ideas. localStorage keys keep the `coin-atlas:` prefix so saved profiles survive; repo name and live URL unchanged.

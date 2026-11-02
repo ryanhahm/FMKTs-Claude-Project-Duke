@@ -27,7 +27,7 @@ export function ModesMenu() {
   );
   return (
     <div ref={ref} className="relative">
-      <button className="btn-frosted" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+      <button className="btn-frosted" data-tour="modes" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         Modes
       </button>
       {open && (

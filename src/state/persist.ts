@@ -38,3 +38,21 @@ export function saveProfile(p: Profile): void {
     // Private mode / storage blocked: the app works without persistence.
   }
 }
+
+const TOUR_KEY = 'coin-atlas:tour-seen:v1';
+
+export function tourSeen(): boolean {
+  try {
+    return window.localStorage.getItem(TOUR_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export function markTourSeen(): void {
+  try {
+    window.localStorage.setItem(TOUR_KEY, '1');
+  } catch {
+    // Storage blocked: the tour simply offers itself again next visit.
+  }
+}

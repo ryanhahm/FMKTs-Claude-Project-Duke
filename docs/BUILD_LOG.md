@@ -39,3 +39,8 @@
 - **Built:** Ambient life (two-way traffic that nearly stops in a crisis, boats on every city's water, circling birds, strolling pedestrians); drag-to-look camera in cities; night falls in the weakest timeline months (moonlit preset, ~60% of windows and all street lamps glow); "Hide panels" button + H key; globe clouds and a soft atmospheric rim.
 - **Expected:** Moving props would blow the 150 draw-call budget.
 - **Actually:** Paris at night with rain, traffic and boats: 149 draw calls (incl. shadows), 17.7k triangles, 0.7 ms/frame on M-series — moving props skip the shadow pass; characters (~16 parts each) are now the main cost if we need to trim further. The first globe glow was a thick white halo; toned down to a thin rim.
+
+## M5d — Guided tour (2026-11-02)
+- **Built:** An 8-step first-run tour (`src/ui/Tour.tsx`) that drives the app itself: globe HUD and legend → Paris (Tokyo for euro travelers) → each of the four tabs (the timeline jumps to Sept 2008 so night, rain and the Lehman caption show) → Modes/Central Bank → Data. Rings the control it describes; Back / Next / Skip / Esc; seen-flag in localStorage; replay from the globe's Tour button.
+- **Expected:** A centered card would work everywhere.
+- **Actually:** Every screen region is already used by a HUD or panel, so the card is placed per step (right, left or bottom-left), and on phones it goes to whichever half the highlighted control isn't in. Testing also exposed a pre-existing phone overlap (wrapped header buttons sat on the globe's Cities row) and a focus-scroll of the clipped app container; both fixed.

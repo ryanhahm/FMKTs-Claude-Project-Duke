@@ -40,6 +40,9 @@ type GameState = {
   /** Index into fxMonthly.months for the timeline tab. */
   timelineIndex: number | null;
   sceneCue: SceneCue;
+  /** Guided tour step (null = not running). */
+  tour: number | null;
+  setTour: (step: number | null) => void;
   setTab: (tab: TabId) => void;
   setTimelineIndex: (i: number | null) => void;
   setSceneCue: (cue: SceneCue) => void;
@@ -77,6 +80,8 @@ export const useGame = create<GameState>((set, get) => ({
   tab: 'worth',
   timelineIndex: null,
   sceneCue: null,
+  tour: null,
+  setTour: (tour) => set({ tour }),
   setTab: (tab) => set({ tab, ...(tab !== 'timeline' ? { sceneCue: null } : {}) }),
   setTimelineIndex: (timelineIndex) => set({ timelineIndex }),
   setSceneCue: (sceneCue) => set({ sceneCue }),

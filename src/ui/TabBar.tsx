@@ -16,6 +16,7 @@ export function TabBar({ active, onChange }: { active: TabId; onChange: (t: TabI
         <button
           key={t.id}
           role="tab"
+          data-tour={`tab-${t.id}`}
           aria-selected={active === t.id}
           disabled={!t.ready}
           title={t.ready ? undefined : 'Coming soon'}

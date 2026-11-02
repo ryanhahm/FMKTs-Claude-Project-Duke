@@ -12,6 +12,8 @@ import { GlobeHud } from './ui/screens/GlobeHud';
 import { AmountScreen, CreateScreen, HomeScreen, TitleScreen } from './ui/screens/Onboarding';
 import { AboutPanel, DataPanel } from './ui/Panels';
 import { ModesMenu } from './ui/ModesMenu';
+import { Tour } from './ui/Tour';
+import { tourSeen } from './state/persist';
 
 const CentralBankScreen = lazy(() => import('./ui/centralBank/CentralBankScreen'));
 
@@ -70,6 +72,11 @@ export default function App() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
+  // First arrival on the globe starts the guided tour (replay from the globe's Tour button).
+  const setTour = useGame((s) => s.setTour);
+  useEffect(() => {
+    if (screen === 'globe' && useGame.getState().tour === null && !tourSeen()) setTour(0);
+  }, [screen, setTour]);
   const onboarding = screen === 'create' || screen === 'home' || screen === 'amount';
 
   useEffect(() => {
@@ -85,7 +92,7 @@ export default function App() {
   const sceneScreen: Screen = screen === 'home' || screen === 'amount' ? 'title' : screen;
 
   return (
-    <div className="relative h-full w-full overflow-hidden">
+    <div className="relative h-full w-full overflow-clip">
       <Canvas
         shadows="soft"
         flat
@@ -129,7 +136,7 @@ export default function App() {
               <span className="sm:hidden">Hide</span>
             </button>
           )}
-          <button className="btn-frosted" onClick={() => setPanel('data')}>
+          <button className="btn-frosted" data-tour="data" onClick={() => setPanel('data')}>
             Data
           </button>
           <button className="btn-frosted" onClick={() => setPanel('about')}>
@@ -137,6 +144,7 @@ export default function App() {
           </button>
         </div>
       )}
+      {!hidden && <Tour />}
       {panel === 'data' && <DataPanel onClose={() => setPanel(null)} />}
       {panel === 'about' && <AboutPanel onClose={() => setPanel(null)} />}
 

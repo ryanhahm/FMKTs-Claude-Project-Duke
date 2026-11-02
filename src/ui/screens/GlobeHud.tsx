@@ -13,7 +13,7 @@ const BAND_LABEL = { further: '▲ further than usual', usual: '● about usual'
 
 /** Globe overlay: what you're carrying, a legend, and an accessible list of the 12 cities. */
 export function GlobeHud() {
-  const { profile, go } = useGame();
+  const { profile, go, setTour } = useGame();
   const home = placeById(profile.homeId);
   const quotes = useQuotes();
   const [listOpen, setListOpen] = useState(false);
@@ -21,7 +21,7 @@ export function GlobeHud() {
 
   return (
     <>
-      <section className="pointer-events-none absolute top-[14%] left-4 sm:left-[6vw]" aria-label="Your money">
+      <section className="pointer-events-none absolute top-[150px] left-4 sm:top-[14%] sm:left-[6vw]" aria-label="Your money" data-tour="carrying">
         <HudNumber
           top="You are carrying"
           value={profile.amount}
@@ -30,17 +30,21 @@ export function GlobeHud() {
         />
       </section>
 
-      <div className="absolute top-16 right-4 flex gap-2">
+      {/* On phones the header buttons wrap to two rows, so this row sits below them. */}
+      <div className="absolute top-[104px] right-4 flex gap-2 sm:top-16">
         <button className="btn-frosted" onClick={() => setListOpen((o) => !o)} aria-expanded={listOpen} aria-controls="city-list">
           Cities
         </button>
         <button className="btn-frosted" onClick={() => go('create')}>
           Edit traveler
         </button>
+        <button className="btn-frosted" onClick={() => setTour(0)}>
+          Tour
+        </button>
       </div>
 
       {listOpen && (
-        <nav id="city-list" className="panel absolute top-28 right-4 max-h-[70vh] w-[300px] overflow-y-auto !p-2" aria-label="All cities">
+        <nav id="city-list" className="panel absolute top-[150px] right-4 sm:top-28 max-h-[70vh] w-[300px] overflow-y-auto !p-2" aria-label="All cities">
           <ul>
             {PLACES.filter((p) => p.id !== home.id).map((p) => {
               const s = quotes?.[p.id]?.strength;
@@ -66,7 +70,7 @@ export function GlobeHud() {
         <Caption text="Pick a city to see what your money is worth there." className="!text-[clamp(22px,3vw,34px)]" />
       </div>
 
-      <div className="legend absolute bottom-10 left-1/2 -translate-x-1/2" aria-label="Marker colors">
+      <div data-tour="legend" className="legend absolute bottom-10 left-1/2 -translate-x-1/2" aria-label="Marker colors">
         <span><i style={{ background: tokens.sunGold }} /> ▲ Goes further than usual</span>
         <span><i style={{ background: tokens.cream }} /> ● About usual</span>
         <span><i style={{ background: tokens.brick }} /> ▼ Goes less far</span>

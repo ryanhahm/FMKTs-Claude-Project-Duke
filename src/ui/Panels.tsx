@@ -103,6 +103,12 @@ export function DataPanel({ onClose }: { onClose: () => void }) {
           (BIS, as a stand-in for short-term deposit rates, compounded monthly), converted back at the latest monthly rate; compared with earning the home policy
           rate. No taxes, fees or spreads. Worst drop = largest peak-to-trough fall of the invested amount in home currency.
         </li>
+        <li>
+          <b>Compare: does PPP hold?</b> For each currency, the average yearly gap between its inflation and yours (World Bank CPI, compounded) against its
+          average yearly fall against your currency (annual averages of monthly ECB rates in the first and last year). Relative purchasing power parity predicts
+          equal values (the 45° line). The slope and R² come from an ordinary least-squares fit across the currencies shown. The window ends in the latest year
+          every country has inflation data; currencies without a full year of ECB rates in the start year are left out.
+        </li>
         <li>Missing data is shown as “No data”, never as zero. Euro-area figures use France’s data.</li>
       </ul>
       <h2>Central Bank mode: the model</h2>

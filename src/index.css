@@ -418,3 +418,17 @@ body { background: var(--color-ink); color: var(--color-cream); font-family: var
 }
 @keyframes tour-pulse { 50% { outline-color: rgba(242, 180, 90, 0.35); } }
 @media (prefers-reduced-motion: reduce) { .tour-ring, .tour-card { animation: none; } }
+
+/* ---------- Compare (PPP test) ---------- */
+.compare-wrap {
+  position: absolute;
+  inset: 64px 16px 36px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.compare-panel { width: min(1000px, 100%); background: rgba(255, 250, 240, 0.94); }
+.compare-panel .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; vertical-align: 0; }
+@media (max-width: 639px) { .compare-wrap { inset: 104px 8px 8px; } .compare-panel { padding: 16px; } }

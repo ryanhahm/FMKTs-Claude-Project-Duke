@@ -13,7 +13,7 @@
 
 ## 1. Pitch
 
-Parity is a browser game that teaches international finance through a low-poly 3D world. You make a small blocky traveler, choose your home country and how much money you're bringing, then fly around a globe of 12 cities. In each city you see what your money is worth (the exchange rate), what it actually buys (purchasing power), how that changed since 1999 — the scene's weather follows your currency's strength — and why the currency is where it is (inflation, real interest rates, trade, reserves, growth). In **Central Bank mode** you run a central bank through a real currency crisis — Switzerland 2015, Türkiye 2018, the UK mini-budget 2022 or Japan's weak yen 2022 — using real starting data, and then see what actually happened. A short guided tour on first arrival (replayable from the globe's **Tour** button) walks through every view in about a minute.
+Parity is a browser game that teaches international finance through a low-poly 3D world. You make a small blocky traveler, choose your home country and how much money you're bringing, then fly around a globe of 12 cities. In each city you see what your money is worth (the exchange rate), what it actually buys (purchasing power), how that changed since 1999 — the scene's weather follows your currency's strength — and why the currency is where it is (inflation, real interest rates, trade, reserves, growth). In **Central Bank mode** you run a central bank through a real currency crisis — Switzerland 2015, Türkiye 2018, the UK mini-budget 2022 or Japan's weak yen 2022 — using real starting data, and then see what actually happened. **Compare mode** puts all 12 currencies on one chart to test purchasing power parity with real data. A short guided tour on first arrival (replayable from the globe's **Tour** button) walks through every view in about a minute.
 
 **The problem it solves:** exchange rates are everywhere in the news but almost nobody can say what "the dollar is strong" means for them. Most people confuse a currency's price with its purchasing power, and assume a stronger currency is always better. Parity makes those ideas concrete and personal ("your $1,000 feels like about $1,650 in Mexico City") and lets players discover that good monetary policy is about stability, not strength.
 
@@ -27,7 +27,8 @@ _(Files in `docs/screenshots/`.)_
 5. Timeline at two dates: September 2008 (stormy) — `m3-paris-timeline-2008-storm.jpg`; March 2015 (sunny) — `m3-paris-timeline-2015-sunny.jpg`
 6. Paris, Tab D "Why" — `m3-paris-tab-d-why.jpg`
 7. Central Bank scenario in play — `m4-central-bank-play.jpg`; results — `m4-central-bank-results.jpg`
-8. Other cities — `m3-tokyo.jpg`, `m3-london.jpg`, `m3-sydney.jpg`, `m3-mumbai.jpg`, `m3-zurich.jpg`
+8. Compare: does PPP hold? — since 1999 with Türkiye `m5-compare-ppp-1999.jpg`; last 5 years without Türkiye `m5-compare-ppp-5y.jpg`
+9. Other cities — `m3-tokyo.jpg`, `m3-london.jpg`, `m3-sydney.jpg`, `m3-mumbai.jpg`, `m3-zurich.jpg`
 
 ## 3. How it meets the requirements
 
@@ -63,10 +64,13 @@ The selected month's exchange rate is ranked against every month since 1999 (per
 ### 4.5 Investing abroad: the carry trade and uncovered interest parity
 The timeline's **"Invest there"** view asks: if you had moved your money into the destination currency at any month since 1999, earned its short-term interest rate (BIS policy rate as the proxy, compounded monthly) and converted back today, would you beat keeping it at home? The result is split into interest earned and the currency effect, annualised, with the worst peak-to-trough drawdown. **Uncovered interest parity** predicts the high-rate currency should weaken just enough to cancel the extra interest. Real data shows both outcomes: $1,000 put into Turkish lira in January 2010 earned +1,374% in interest but lost 97% on the currency, ending at **$439** (vs **$1,293** in U.S. rates); the same trade in Mexican pesos ended at **$1,945** — UIP failed and the carry trade paid, but with a 35% drop along the way. No taxes, fees or spreads; past returns don't predict future ones.
 
-### 4.6 "Why" — five factors
+### 4.6 Does purchasing power parity hold? (Compare mode)
+**Relative PPP** says a currency should fall against yours by about as much as its prices rise faster than yours. Compare mode tests it on all the currencies at once: for each one, the average yearly inflation gap vs your home country (World Bank CPI, compounded) is plotted against its average yearly fall against your currency (annual averages of monthly ECB rates in the first and last year). On the 45° line PPP holds exactly; an ordinary least-squares fit gives the slope (PPP predicts 1) and R². Against the U.S. dollar, 1999–2024: **slope 1.04, R² 0.97** — but Türkiye (17% a year of extra inflation, the lira falling 19% a year) drives much of that. Without Türkiye: **slope 0.93, R² 0.64**. Over just the last five years (2019–2024, without Türkiye): **slope 0.44, R² 0.05** — over short spans, interest rates, risk and trade dominate, which is why the yen fell 6.8% a year while Japan's prices rose more slowly than America's. This is the textbook finding: PPP is a poor guide over a few years and a good one over decades. Brazil and India are left out of the 1999 window (no full year of ECB rates); the window ends in 2024, the latest year with U.S. inflation data.
+
+### 4.7 "Why" — five factors
 For the destination vs home, using the latest World Bank year (shown): inflation higher by >1pt → ▼; real interest rate (BIS policy rate − CPI inflation) higher by >1pt → ▲; current account weaker by >2pt of GDP → ▼; reserves <3 months of imports → ▼, >6 → ▲ (ignored for free-floating major currencies, whose central banks rarely defend the exchange rate); GDP growth higher/lower by >1pt → ▲/▼. A deterministic template turns these into a plain-English summary (no LLM). We chose policy rate − CPI over the World Bank's real interest rate because the latter is lending-rate based and not comparable across countries (it shows ~37% for Brazil).
 
-### 4.7 Central Bank model (teaching model, not a forecast)
+### 4.8 Central Bank model (teaching model, not a forecast)
 State: inflation, policy rate, growth, unemployment, currency index (100 = start), reserves (months of imports), new debt, credibility, approval. One turn = one quarter, eight turns. Real rate r = policy rate − expected inflation, where expected inflation = credibility-weighted mix of the target and current inflation.
 
 - **Currency change** = 1.2·credFactor·(r − r_world)/4 − 3·print ± 2.5·intervention − 0.15·newDebt + 0.4·CA/4 + background pressure + events + noise(σ=1.5)

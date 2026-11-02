@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useGame } from '../state/useGame';
 
-/** Top-right Modes menu (CLAUDE.md §6.5): Explore / Central Bank. */
+/** Top-right Modes menu (CLAUDE.md §6.5): Explore / Central Bank / Compare. */
 export function ModesMenu() {
   const { screen, go } = useGame();
   const [open, setOpen] = useState(false);
@@ -34,6 +34,7 @@ export function ModesMenu() {
         <div role="menu" className="panel absolute top-11 right-0 z-30 w-[260px] !p-1.5">
           {item('Explore', 'Travel the globe and compare what your money is worth', screen === 'globe' || screen === 'city', () => go('globe'))}
           {item('Central Bank', 'Run a central bank through a real currency crisis', screen === 'centralBank', () => go('centralBank'))}
+          {item('Compare', 'Does purchasing power parity hold? All 12 currencies on one chart', screen === 'compare', () => go('compare'))}
         </div>
       )}
     </div>

@@ -16,6 +16,7 @@ import { Tour } from './ui/Tour';
 import { tourSeen } from './state/persist';
 
 const CentralBankScreen = lazy(() => import('./ui/centralBank/CentralBankScreen'));
+const CompareScreen = lazy(() => import('./ui/compare/CompareScreen'));
 
 function SceneFor({ screen, cityId }: { screen: Screen; cityId: string }) {
   switch (screen) {
@@ -28,6 +29,8 @@ function SceneFor({ screen, cityId }: { screen: Screen; cityId: string }) {
     }
     case 'globe':
       return <GlobeScene key="explore" mode="explore" intro />;
+    case 'compare':
+      return <GlobeScene key="compare" mode="title" />;
     default:
       return <GlobeScene key="title" mode="title" />;
   }
@@ -51,6 +54,12 @@ function Overlay({ screen }: { screen: Screen }) {
       return (
         <Suspense fallback={null}>
           <CentralBankScreen />
+        </Suspense>
+      );
+    case 'compare':
+      return (
+        <Suspense fallback={null}>
+          <CompareScreen />
         </Suspense>
       );
   }
@@ -150,7 +159,7 @@ export default function App() {
 
       <footer
         className={`hud-sub-small pointer-events-none absolute right-4 bottom-2 text-right text-xs text-white ${
-          hidden ? 'hidden' : onboarding || screen === 'city' || screen === 'centralBank' ? 'hidden sm:block' : ''
+          hidden ? 'hidden' : onboarding || screen === 'city' || screen === 'centralBank' || screen === 'compare' ? 'hidden sm:block' : ''
         }`}
       >
         Data last updated {meta ? new Date(meta.generatedAt).toLocaleDateString('en-US', { dateStyle: 'medium' }) : '—'}

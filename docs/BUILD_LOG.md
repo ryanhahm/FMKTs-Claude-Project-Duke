@@ -49,3 +49,8 @@
 - **Built:** Renamed the app from "Coin Atlas" to **Parity** (title, header, About, tour, README, submission).
 - **Expected:** A name that says something about the finance inside.
 - **Actually:** One-line change per file; storage keys kept so returning players' travelers survive.
+
+## M5f — Compare: does PPP hold? (2026-11-02)
+- **Built:** A Compare mode (Modes menu): one dot per currency, average yearly inflation gap vs home (World Bank CPI) against average yearly depreciation vs home (ECB annual averages), the 45° PPP line, OLS slope and R², period chips (since 1999 / since 2010 / last 5 years), an "include Türkiye" toggle, hover tooltips, a table view. Pure, tested function `src/finance/pppTest.ts` (6 tests).
+- **Expected:** Long-run relative PPP to roughly hold.
+- **Actually:** vs USD 1999–2024 slope 1.04, R² 0.97, but mostly thanks to Türkiye; without it slope 0.93, R² 0.64; last five years without it slope 0.44, R² 0.05 (yen fell 6.8%/yr despite lower inflation). The textbook "PPP holds in the long run, not the short run" falls straight out of our data. BRL/INR lack full 1999 ECB rates, so they appear only from 2010.

@@ -43,8 +43,8 @@ function steps(home: string, dest: string): Step[] {
       body: 'Five forces behind a currency: inflation, real interest rates, trade balance, reserves and growth. Arrows show whether each one pushes this currency up or down against yours.',
     },
     {
-      screen: 'city', tab: 'worth', target: 'modes', title: 'Run a central bank',
-      body: 'Under Modes, Central Bank puts you in charge during a real crisis: Switzerland 2015, Türkiye 2018, the UK 2022 or Japan 2022. Afterwards, see what really happened.',
+      screen: 'city', tab: 'worth', target: 'modes', title: 'More under Modes',
+      body: 'Central Bank puts you in charge during a real crisis (Switzerland 2015, Türkiye 2018, the UK 2022, Japan 2022), then shows what really happened. Compare puts all 12 currencies on one chart to test purchasing power parity.',
     },
     {
       screen: 'city', tab: 'worth', target: 'data', title: 'Where the numbers come from',

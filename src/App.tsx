@@ -108,8 +108,8 @@ export default function App() {
         dpr={[1, 2]}
         camera={{ fov: 42, near: 0.05, far: 400, position: [0, 0, 4] }}
         onCreated={(state) => {
-          // Dev-only hooks for perf/debug checks: window.__gl.info.render.{calls,triangles}, window.__r3f.camera
-          if (import.meta.env.DEV) Object.assign(window, { __gl: state.gl, __r3f: state });
+          // Dev-only hooks for perf/debug checks: window.__gl.info.render.{calls,triangles}, window.__r3f.camera, window.__game (store)
+          if (import.meta.env.DEV) Object.assign(window, { __gl: state.gl, __r3f: state, __game: useGame });
         }}
       >
         <Suspense fallback={null}>

@@ -168,6 +168,9 @@ export function TimelinePanel({ d }: { d: CityData }) {
   }, [t, i, d.sameCurrency, setCue]);
 
   // Show an event's caption for ~3s when the playhead lands on (or passes) its month.
+  // The hide timer lives in a ref so moving the slider on doesn't cancel it (the caption used to stick).
+  const captionTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(captionTimer.current), []);
   useEffect(() => {
     if (!t) return;
     const month = t.fx.months[i]!;
@@ -175,8 +178,8 @@ export function TimelinePanel({ d }: { d: CityData }) {
     if (ev && lastCaptionMonth.current !== month) {
       lastCaptionMonth.current = month;
       setCaption(ev);
-      const h = setTimeout(() => setCaption((c) => (c === ev ? null : c)), CAPTION_MS);
-      return () => clearTimeout(h);
+      clearTimeout(captionTimer.current);
+      captionTimer.current = setTimeout(() => setCaption((c) => (c === ev ? null : c)), CAPTION_MS);
     }
     if (!ev) lastCaptionMonth.current = null;
   }, [t, i]);

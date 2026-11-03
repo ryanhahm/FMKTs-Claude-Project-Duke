@@ -1,13 +1,12 @@
 # Parity — How far does your money really go?
 
 **FMKT 256 Extra Credit Project on AI · Prompt #1: "Build a finance app" · Duke University, Fall 2026**
-**Team:** _[Name — Product lead]_, _[Name — Design lead]_, _[Name — Finance lead]_, _[Name — Engineering lead]_
 **Date:** November 3, 2026
 
 **Live app (no login):** https://ryanhahm.github.io/FMKTs-Claude-Project-Duke/
 **Source code (public):** https://github.com/ryanhahm/FMKTs-Claude-Project-Duke
 
-> _Before exporting: confirm both links open in a private/incognito window, fill in team names, and swap in the final screenshots listed in §4._
+> _Before exporting: confirm both links open in a private/incognito window, and swap in the final screenshots listed in §4._
 
 ---
 

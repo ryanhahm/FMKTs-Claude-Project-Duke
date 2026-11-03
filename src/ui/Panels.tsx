@@ -163,7 +163,7 @@ export function AboutPanel({ onClose }: { onClose: () => void }) {
         The Economist.
       </p>
       <p>
-        Built for FMKT 256 (Duke University, Fall 2026) by <i>team names coming soon</i>, with Claude Code.
+        Built for FMKT 256 (Duke University, Fall 2026) with Claude Code.
       </p>
       <p className="muted">
         Educational tool. The models are deliberately simplified and every estimate is labelled. Nothing here is financial advice.

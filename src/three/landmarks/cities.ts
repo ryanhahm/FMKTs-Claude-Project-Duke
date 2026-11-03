@@ -115,7 +115,18 @@ export const LANDMARKS: Record<string, Landmark> = {
       b.box(shades.zinc, [0, 11.2, 0], [0.4, 1.6, 0.4]);
       b.box(shades.zinc, [0, 12.6, 0], [0.1, 1.2, 0.1]);
       b.box(shades.glow, [0, 13.2, 0], [0.16, 0.16, 0.16], undefined, 1);
-      for (let f = 0; f < 14; f++) for (const [k, x] of [-0.6, 0, 0.6].entries()) b.box(windowColor(k, f), [x, 0.6 + f * 0.7, 1.61], [0.22, 0.4, 0.03]);
+      // Windows sit on each setback's own faces: [half-width, first row y, rows, columns].
+      const tiers = [[1.6, 0.6, 5, 5], [1.2, 4.5, 4, 4], [0.9, 7.5, 3, 3]] as const;
+      for (let side = 0; side < 4; side++) {
+        b.push([0, 0, 0], (side * Math.PI) / 2);
+        let row = 0;
+        for (const [half, y0, rows, cols] of tiers) {
+          const step = (half * 2) / cols;
+          for (let f = 0; f < rows; f++, row++)
+            for (let c = 0; c < cols; c++) b.box(windowColor(c + side, row), [-half + step * (c + 0.5), y0 + f * 0.7, half + 0.01], [0.22, 0.4, 0.03]);
+        }
+        b.pop();
+      }
       b.pop();
       // Chrysler-like crown
       b.push([-3.6, 0, -8]);

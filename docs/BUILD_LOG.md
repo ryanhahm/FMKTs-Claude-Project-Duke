@@ -54,3 +54,8 @@
 - **Built:** A Compare mode (Modes menu): one dot per currency, average yearly inflation gap vs home (World Bank CPI) against average yearly depreciation vs home (ECB annual averages), the 45° PPP line, OLS slope and R², period chips (since 1999 / since 2010 / last 5 years), an "include Türkiye" toggle, hover tooltips, a table view. Pure, tested function `src/finance/pppTest.ts` (6 tests).
 - **Expected:** Long-run relative PPP to roughly hold.
 - **Actually:** vs USD 1999–2024 slope 1.04, R² 0.97, but mostly thanks to Türkiye; without it slope 0.93, R² 0.64; last five years without it slope 0.44, R² 0.05 (yen fell 6.8%/yr despite lower inflation). The textbook "PPP holds in the long run, not the short run" falls straight out of our data. BRL/INR lack full 1999 ECB rates, so they appear only from 2010.
+
+## M5g — Currency switcher, local starting amounts, NYC fix (2026-11-02)
+- **Built:** A currency button on the globe (e.g. "¥ JPY ▾") to change home currency without redoing onboarding; money is converted at today's rate. Quick-pick amounts are now about US$100 / $1,000 / $10,000 in each currency, rounded to 1/1.5/2/3/5 × 10ⁿ (¥150,000, ₩1,500,000, ₹100,000), with a live "≈ $X USD" line. Pure, tested `src/finance/presets.ts` (5 tests). Empire State windows now sit on each setback, on all four sides.
+- **Expected:** Fixed 100 / 1,000 / 10,000 for every currency looked wrong in yen, won and rupees (¥1,000 ≈ $6).
+- **Actually:** Plain 1/2/5 rounding left picks up to 27% off the dollar target (¥200,000 ≈ $1,270); adding 1.5 and 3 keeps them close. A quick-pick amount maps to the same tier in the new currency; a custom amount is converted and rounded to 3 significant figures.

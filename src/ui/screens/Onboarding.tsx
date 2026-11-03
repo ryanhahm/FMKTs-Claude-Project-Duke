@@ -4,7 +4,9 @@ import { PLACES } from '../../data/places';
 import type { HairStyle } from '../../three/Character';
 import { placeById, useGame } from '../../state/useGame';
 import { Caption } from '../Caption';
-import { formatAmount } from '../format';
+import { convert } from '../../finance/fx';
+import { presetAmounts, switchAmount } from '../../finance/presets';
+import { formatAmount, formatMoney } from '../format';
 import { PlaceIcon } from '../PlaceIcon';
 
 const SHIRTS = [tokens.terracotta, tokens.sage, tokens.skyBlue, tokens.sunGold, tokens.dusk, tokens.brick] as const;
@@ -133,7 +135,12 @@ export function CreateScreen() {
 }
 
 export function HomeScreen() {
-  const { profile, updateProfile, go } = useGame();
+  const { profile, updateProfile, go, fxLatest } = useGame();
+  const pick = (id: string) => {
+    if (id === profile.homeId) return;
+    const amount = switchAmount(profile.amount, placeById(profile.homeId).currency, placeById(id).currency, fxLatest?.rates);
+    updateProfile({ homeId: id, amount });
+  };
   return (
     <div className="absolute inset-0 flex items-end justify-center p-4 sm:items-center">
       <div className="panel flex max-h-[86vh] w-full max-w-[760px] flex-col">
@@ -149,7 +156,7 @@ export function HomeScreen() {
                 role="radio"
                 aria-checked={on}
                 className={`place-card ${on ? 'place-card-on' : ''}`}
-                onClick={() => updateProfile({ homeId: p.id })}
+                onClick={() => pick(p.id)}
                 onDoubleClick={() => go('amount')}
               >
                 <PlaceIcon id={p.id} className="h-8 w-8 shrink-0" />
@@ -176,14 +183,26 @@ export function HomeScreen() {
   );
 }
 
-const QUICK = [100, 1000, 10000];
+const USD = PLACES.find((p) => p.currency === 'USD')!;
+const EUR = PLACES.find((p) => p.currency === 'EUR')!;
 
 export function AmountScreen() {
-  const { profile, updateProfile, commitProfile, go } = useGame();
+  const { profile, updateProfile, commitProfile, go, fxLatest } = useGame();
   const home = placeById(profile.homeId);
   const [text, setText] = useState(profile.amount.toLocaleString('en-US'));
   const value = Number(text.replace(/[,\s]/g, ''));
   const valid = Number.isFinite(value) && value > 0 && value <= 1e12;
+  const quick = presetAmounts(home.currency, fxLatest?.rates);
+  // Show what the amount is worth in dollars (or euros for a dollar holder), at today's ECB rate.
+  const ref = home.currency === 'USD' ? EUR : USD;
+  const inRef = (v: number) => {
+    if (!fxLatest) return null;
+    try {
+      return formatMoney(convert(v, fxLatest.rates, home.currency, ref.currency), ref);
+    } catch {
+      return null;
+    }
+  };
   return (
     <div className="absolute inset-0 flex items-end justify-center p-4 sm:items-center">
       <form
@@ -214,9 +233,18 @@ export function AmountScreen() {
           />
           <span className="font-sans text-sm font-semibold text-ink/55">{home.currency}</span>
         </div>
-        {!valid && <p className="mt-1 font-sans text-xs font-medium text-brick">Enter an amount above zero.</p>}
+        {!valid ? (
+          <p className="mt-1 font-sans text-xs font-medium text-brick">Enter an amount above zero.</p>
+        ) : (
+          inRef(value) && (
+            <p className="mt-1 font-sans text-xs text-ink/65">
+              ≈ {inRef(value)} {ref.currency} at today&rsquo;s exchange rate
+            </p>
+          )
+        )}
+        {home.currency !== 'USD' && <p className="mt-3 font-sans text-xs text-ink/65">Quick picks: about $100, $1,000 and $10,000, rounded to amounts people carry in {home.currencyPlural}.</p>}
         <div className="mt-3 flex gap-2">
-          {QUICK.map((q) => (
+          {quick.map((q) => (
             <button key={q} type="button" className={`chip flex-1 ${value === q ? 'chip-on' : ''}`} onClick={() => setText(q.toLocaleString('en-US'))}>
               {home.symbol}
               {formatAmount(q, home.currency)}

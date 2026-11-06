@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-11-05T01:30:28.169Z",
+  "generatedAt": "2026-11-06T01:36:19.316Z",
   "sources": [
     {
       "id": "fx",
       "name": "European Central Bank euro reference rates (via Frankfurter API)",
       "url": "https://frankfurter.dev",
       "coverage": "Daily since 1999-01-04; stored as monthly averages + latest daily",
-      "lastObservation": "2026-11-04",
+      "lastObservation": "2026-11-05",
       "notes": "Cross rates between non-euro currencies are computed through the euro."
     },
     {
@@ -30,7 +30,7 @@
       "name": "Bank for International Settlements central bank policy rates (WS_CBPOL)",
       "url": "https://data.bis.org/topics/CBPOL",
       "coverage": "Monthly, end of period, since 1999; euro area for Paris",
-      "lastObservation": "2026-09",
+      "lastObservation": "2026-10",
       "notes": "Real policy rate = annual average policy rate − CPI inflation (derived)."
     }
   ]

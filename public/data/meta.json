@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-11-11T01:19:26.713Z",
+  "generatedAt": "2026-11-12T02:39:59.844Z",
   "sources": [
     {
       "id": "fx",
       "name": "European Central Bank euro reference rates (via Frankfurter API)",
       "url": "https://frankfurter.dev",
       "coverage": "Daily since 1999-01-04; stored as monthly averages + latest daily",
-      "lastObservation": "2026-11-10",
+      "lastObservation": "2026-11-11",
       "notes": "Cross rates between non-euro currencies are computed through the euro."
     },
     {
@@ -15,7 +15,7 @@
       "url": "https://data.worldbank.org",
       "coverage": "Annual, 1999–2026; FP.CPI.TOTL.ZG, NY.GDP.MKTP.KD.ZG, SL.UEM.TOTL.ZS, BN.CAB.XOKA.GD.ZS, FI.RES.TOTL.MO, FR.INR.RINR, PA.NUS.PRVT.PP, PA.NUS.FCRF",
       "lastObservation": "2026",
-      "notes": "Price level ratio = PA.NUS.PRVT.PP ÷ PA.NUS.FCRF (derived; PA.NUS.PPPC.RF is archived). France data shown for the euro. WB last updated: 2026-10-08"
+      "notes": "Price level ratio = PA.NUS.PRVT.PP ÷ PA.NUS.FCRF (derived; PA.NUS.PPPC.RF is archived). France data shown for the euro. WB last updated: 2026-11-11"
     },
     {
       "id": "bigmac",

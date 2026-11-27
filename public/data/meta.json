@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-11-26T03:37:12.416Z",
+  "generatedAt": "2026-11-27T03:39:52.937Z",
   "sources": [
     {
       "id": "fx",
       "name": "European Central Bank euro reference rates (via Frankfurter API)",
       "url": "https://frankfurter.dev",
       "coverage": "Daily since 1999-01-04; stored as monthly averages + latest daily",
-      "lastObservation": "2026-11-25",
+      "lastObservation": "2026-11-26",
       "notes": "Cross rates between non-euro currencies are computed through the euro."
     },
     {
